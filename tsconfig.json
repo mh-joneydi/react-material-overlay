@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"module": "es2015",
+		"target": "es2018",
+		"jsx": "react",
+		"declarationDir": "dist/types",
+		"emitDeclarationOnly": true,
+		"rootDir": "./src",
+		"outDir": "./dist",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"lib": ["dom", "dom.iterable", "esnext"],
+    "sourceMap": false,
+    "declarationMap": false,
+    "declaration": true,
+		"moduleResolution": "node",
+		"noEmit": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist"]
+}

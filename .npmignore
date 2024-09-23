@@ -1,0 +1,9 @@
+src/
+node_modules/
+rollup.config.js
+tsconfig.json
+.gitignore
+.prettierignore
+.prettierrc
+.eslintignore
+.eslintrc
