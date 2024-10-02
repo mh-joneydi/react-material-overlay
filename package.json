@@ -54,6 +54,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.4",
     "@rollup/plugin-typescript": "^12.1.0",
+    "@types/lodash": "^4.17.9",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
@@ -78,6 +79,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "async-mutex": "^0.5.0"
+    "async-mutex": "^0.5.0",
+    "lodash": "^4.17.21"
   }
 }

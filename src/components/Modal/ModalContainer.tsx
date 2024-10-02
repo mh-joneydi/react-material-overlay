@@ -1,23 +1,39 @@
+import { merge } from 'lodash';
+
 import { useModalContainer } from '../../hooks/Modal/useModalContainer';
 import { IModalContainerProps } from '../../types';
 
 import Modal from './Modal';
 
-export const defaultProps: IModalContainerProps = {};
+interface ModalContainerProps {
+	reactSuspenseFallback?: React.ReactNode;
+	defaultOptions: IModalContainerProps;
+}
 
-export default function ModalContainer(props: IModalContainerProps) {
-	const containerProps = {
-		...defaultProps,
-		...props
-	};
+export const defaultProps: ModalContainerProps = {
+	reactSuspenseFallback: 'Loading...',
+	defaultOptions: {
+		scroll: 'paper',
+		closeOnBackdropClick: true,
+		fullWidth: true,
+		maxWidth: 'sm',
+		fullScreen: false,
+		closeButton: true,
+		header: true
+	}
+};
 
-	const { isModalActive, modalList } = useModalContainer(containerProps);
+export default function ModalContainer(props: ModalContainerProps) {
+	const { defaultOptions: options, reactSuspenseFallback } = merge({}, defaultProps, props);
+
+	const { isModalActive, modalList } = useModalContainer(options);
 
 	return modalList.map(({ content, props: modalProps }) => (
 		<Modal
 			{...modalProps}
+			reactSuspenseFallback={reactSuspenseFallback}
 			show={isModalActive(modalProps.modalId, modalProps.containerId)}
-			key={`modal-${modalProps.modalId}`}
+			key={`${modalProps.containerId}-${modalProps.modalId}`}
 		>
 			{content}
 		</Modal>

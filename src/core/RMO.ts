@@ -1,93 +1,139 @@
 import { Mutex } from 'async-mutex';
+import { isEqual } from 'lodash';
 
-import { Id, IModalOptions } from '../types';
-import { Default, Events } from '../utils/constant';
-import EventEmitter from '../utils/EventEmitter';
+import { Id, IModalOptions, INotValidatedModalProps } from '../types';
+import { Default } from '../utils/constant';
+import { isNum, isStr } from '../utils/propValidator';
+
+import { genModalId } from './Modal/genModalId';
+import { popModal, pushModal } from './Modal/store';
 
 type StackItemType = {
 	type: 'modal';
 	containerId: Id;
+	modalId: Id;
 };
 
 const mutex = new Mutex();
 
 const stack: Array<StackItemType> = [];
 
-function emitPopEventHandler(stackItem: StackItemType) {
+function popOverlay(stackItem: StackItemType) {
 	if (stackItem.type === 'modal') {
-		EventEmitter.emit(Events.PopModal, { containerId: stackItem.containerId });
+		popModal(stackItem.containerId);
 	}
 }
 
-async function multiplePop(items: Array<StackItemType>) {
-	if (items.length > 0) {
-		items.forEach(emitPopEventHandler);
+async function popHistoryState(count: number = 1) {
+	return new Promise<void>((resolve) => {
+		function onPopState(e: PopStateEvent) {
+			const stackLength = (e.state?.rmoStackLength as number | null) || 0;
 
-		await new Promise<void>((resolve) => {
-			function onPopState(e: PopStateEvent) {
-				const stackLength = (e.state?.rmoStackLength as number | null) || 0;
-
-				if (!stackLength || stackLength === stack.length) {
-					window.removeEventListener('popstate', onPopState);
-					resolve();
-				}
+			if (!stackLength || stackLength === stack.length) {
+				window.removeEventListener('popstate', onPopState);
+				resolve();
 			}
+		}
 
-			window.addEventListener('popstate', onPopState);
+		window.addEventListener('popstate', onPopState);
 
-			window.history.go(-items.length);
-		});
+		window.history.go(-count);
+	});
+}
+
+async function multiplePop(startIndex: number) {
+	const items = stack.splice(startIndex);
+
+	if (items.length > 0) {
+		items.forEach(popOverlay);
+
+		await popHistoryState(items.length);
 	}
+}
+
+export function popRMOStackState(params: StackItemType) {
+	mutex.runExclusive(async () => {
+		const lastItem = stack.at(-1);
+
+		if (lastItem) {
+			if (isEqual(lastItem, params)) {
+				stack.pop();
+				await popHistoryState();
+			}
+		}
+	});
+}
+
+/**
+ * Generate a modalId or use the one provided
+ */
+function getModalId(options?: IModalOptions) {
+	return options && (isStr(options.modalId) || isNum(options.modalId)) ? options.modalId : genModalId();
+}
+
+/**
+ * Merge provided options with the defaults settings and generate the modalId
+ */
+function mergeModalOptions(sequenceNumber: number, options?: IModalOptions) {
+	return {
+		...options,
+		modalId: getModalId(options),
+		sequenceNumber
+	} as INotValidatedModalProps;
 }
 
 /**
  * open new modal overlay
+ * @returns modal is pushed. If the container is not mounted or modal is duplicate returns `false`
+ * @example
+ * const pushed = await RMO.pushModal("content");
  */
-async function pushModal(content: React.ReactNode, options?: IModalOptions) {
-	await mutex.runExclusive(() => {
-		EventEmitter.emit(Events.PushModal, { content, options, sequenceNumber: stack.length });
+function _pushModal(content: React.ReactNode, options?: IModalOptions): Promise<boolean> {
+	return mutex.runExclusive(() => {
+		const mergedOptions = mergeModalOptions(stack.length, options);
+		const pushed = pushModal(content, mergedOptions);
 
-		stack.push({ type: 'modal', containerId: options?.containerId || Default.CONTAINER_ID });
+		if (pushed) {
+			stack.push({
+				type: 'modal',
+				containerId: options?.containerId || Default.CONTAINER_ID,
+				modalId: mergedOptions.modalId
+			});
 
-		window.history.pushState(
-			{
-				...window.history.state,
-				rmoStackLength: stack.length
-			},
-			''
-		);
+			window.history.pushState(
+				{
+					...window.history.state,
+					rmoStackLength: stack.length
+				},
+				''
+			);
+		}
+
+		return pushed;
 	});
 }
 
 /**
- * Remove overlays programmatically
+ * Remove(close) overlays programmatically
  *
- * - remove the last overlay:
+ * - Remove the last active overlay:
  * ```
  * RMO.pop()
  * ```
  *
- * - Remove the last two overlays:
+ * - Remove the last two active overlays:
  * ```
  * RMO.pop(2)
  */
-async function pop(count: number = 1) {
-	await mutex.runExclusive(async () => {
-		const items = stack.splice(-count);
-
-		await multiplePop(items);
-	});
+function pop(count: number = 1) {
+	return mutex.runExclusive(() => multiplePop(-count));
 }
 
 /**
- * remove all overlays
+ * remove(close) all active overlays
  */
-async function popAll() {
-	await mutex.runExclusive(async () => {
-		const items = stack.splice(0);
-
-		await multiplePop(items);
-	});
+function popAll() {
+	return mutex.runExclusive(() => multiplePop(0));
 }
 
 if (typeof window !== 'undefined') {
@@ -106,7 +152,7 @@ if (typeof window !== 'undefined') {
 					const item = stack.pop();
 
 					if (item) {
-						emitPopEventHandler(item);
+						popOverlay(item);
 					}
 				});
 			}
@@ -115,7 +161,7 @@ if (typeof window !== 'undefined') {
 }
 
 const RMO = {
-	pushModal,
+	pushModal: _pushModal,
 	pop,
 	popAll
 };

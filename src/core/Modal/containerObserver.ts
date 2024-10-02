@@ -1,7 +1,19 @@
-import type { Id, IModal, IModalContainerProps, IModalProps, INotValidatedModalProps, Notify } from '../../types';
+import React from 'react';
+import { merge } from 'lodash';
+
+import type {
+	Id,
+	IModal,
+	IModalContainerProps,
+	IModalProps,
+	INotValidatedModalProps,
+	ModalContent,
+	Notify
+} from '../../types';
 import { Default } from '../../utils/constant';
-import { isFn } from '../../utils/propValidator';
-import RMO from '../RMO';
+import mergeClasses from '../../utils/mergeClasses';
+import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
+import { popRMOStackState } from '../RMO';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
@@ -41,11 +53,11 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 		notify();
 	};
 
-	const addActiveModal = async (modal: IActiveModal) => {
+	const pushModal = async (modal: IActiveModal) => {
 		const { modalId, onOpen } = modal.props;
 
 		modals.set(modalId, modal);
-		activeModals.push(modalId);
+		activeModals = [...activeModals, modalId];
 
 		notify();
 
@@ -54,23 +66,34 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 		}
 	};
 
-	const buildModal = (content: React.ReactNode, options: INotValidatedModalProps, sequenceNumber: number) => {
+	const buildModal = (content: ModalContent, options: INotValidatedModalProps): boolean => {
 		if (shouldIgnoreModal(options)) {
-			return;
+			return false;
 		}
 
 		const { modalId } = options;
 
 		const closeModal = () => {
-			RMO.pop();
+			popModal();
+			popRMOStackState({ type: 'modal', containerId: id, modalId });
 		};
 
 		modalCount++;
 
+		const {
+			sx: defaultSx,
+			classes: defaultClasses,
+			closeButton: defaultCloseButton,
+			header: defaultHeader,
+			closeButtonIcon: defaultCloseButtonIcon,
+			...containerProps
+		} = props;
+
+		const { classes, closeButton, header, closeButtonIcon, ...modalOptions } = options;
+
 		const modalProps = {
-			...props,
-			...options,
-			sequenceNumber,
+			defaultSx,
+			...merge({}, containerProps, modalOptions),
 			modalId,
 			closeModal,
 			deleteModal() {
@@ -93,12 +116,53 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 			}
 		} as IModalProps;
 
+		if (isFn(classes)) {
+			modalProps.classes = classes(defaultClasses);
+		} else if (defaultClasses && classes) {
+			modalProps.classes = mergeClasses(defaultClasses, classes);
+		} else if (defaultClasses) {
+			modalProps.classes = defaultClasses;
+		} else {
+			modalProps.classes = classes;
+		}
+
+		modalProps.closeButton = defaultCloseButton;
+
+		if (closeButton === false || canBeRendered(closeButton)) {
+			modalProps.closeButton = closeButton;
+		} else if (closeButton === true) {
+			modalProps.closeButton = canBeRendered(defaultCloseButton) ? defaultCloseButton : true;
+		}
+
+		modalProps.closeButtonIcon = closeButtonIcon || defaultCloseButtonIcon;
+
+		modalProps.header = defaultHeader;
+
+		if (header === false || canBeRendered(header)) {
+			modalProps.header = header;
+		} else if (header === true) {
+			modalProps.header = canBeRendered(defaultHeader) ? defaultHeader : true;
+		}
+
+		let modalContent = content;
+
+		if (React.isValidElement(content) && !isStr(content.type)) {
+			modalContent = React.cloneElement(content as React.ReactElement, {
+				closeModal,
+				modalProps
+			});
+		} else if (isFn(content)) {
+			modalContent = content({ closeModal, modalProps });
+		}
+
 		const activeModal: IActiveModal = {
-			content,
+			content: modalContent as React.ReactNode,
 			props: modalProps
 		};
 
-		addActiveModal(activeModal);
+		pushModal(activeModal);
+
+		return true;
 	};
 
 	return {
