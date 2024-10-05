@@ -93,8 +93,9 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 
 		const modalProps = {
 			defaultSx,
-			...merge({}, containerProps, modalOptions),
+			...merge({}, containerProps, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
 			modalId,
+			containerId: id,
 			closeModal,
 			deleteModal() {
 				const modalToRemove = modals.get(modalId)!;

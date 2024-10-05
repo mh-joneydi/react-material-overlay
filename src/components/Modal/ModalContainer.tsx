@@ -11,11 +11,10 @@ interface ModalContainerProps {
 }
 
 export const defaultProps: ModalContainerProps = {
-	reactSuspenseFallback: 'Loading...',
 	defaultOptions: {
 		scroll: 'paper',
 		closeOnBackdropClick: true,
-		fullWidth: true,
+		fullWidth: false,
 		maxWidth: 'sm',
 		fullScreen: false,
 		closeButton: true,
@@ -28,14 +27,16 @@ export default function ModalContainer(props: ModalContainerProps) {
 
 	const { isModalActive, modalList } = useModalContainer(options);
 
-	return modalList.map(({ content, props: modalProps }) => (
-		<Modal
-			{...modalProps}
-			reactSuspenseFallback={reactSuspenseFallback}
-			show={isModalActive(modalProps.modalId, modalProps.containerId)}
-			key={`${modalProps.containerId}-${modalProps.modalId}`}
-		>
-			{content}
-		</Modal>
-	));
+	return modalList.map(({ content, props: modalProps }) => {
+		return (
+			<Modal
+				{...modalProps}
+				reactSuspenseFallback={reactSuspenseFallback}
+				show={isModalActive(modalProps.modalId, modalProps.containerId)}
+				key={`modal-${modalProps.containerId}-${modalProps.modalId}`}
+			>
+				{content}
+			</Modal>
+		);
+	});
 }

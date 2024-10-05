@@ -1,18 +1,24 @@
 import { Mutex } from 'async-mutex';
 import { isEqual } from 'lodash';
 
-import { Id, IModalOptions, INotValidatedModalProps } from '../types';
+import {
+	IAlertDialogOptions,
+	Id,
+	IModalOptions,
+	INotValidatedAlertDialogProps,
+	INotValidatedModalProps
+} from '../types';
 import { Default } from '../utils/constant';
 import { isNum, isStr } from '../utils/propValidator';
 
+import { genAlertDialogId } from './AlertDialog/genAlertDialogId';
+import { popAlertDialog, pushAlertDialog } from './AlertDialog/store';
 import { genModalId } from './Modal/genModalId';
 import { popModal, pushModal } from './Modal/store';
 
-type StackItemType = {
-	type: 'modal';
-	containerId: Id;
-	modalId: Id;
-};
+type StackItemType =
+	| { type: 'modal'; containerId: Id; modalId: Id }
+	| { type: 'alertDialog'; containerId: Id; alertDialogId: Id };
 
 const mutex = new Mutex();
 
@@ -21,6 +27,8 @@ const stack: Array<StackItemType> = [];
 function popOverlay(stackItem: StackItemType) {
 	if (stackItem.type === 'modal') {
 		popModal(stackItem.containerId);
+	} else if (stackItem.type === 'alertDialog') {
+		popAlertDialog(stackItem.containerId);
 	}
 }
 
@@ -114,6 +122,57 @@ function _pushModal(content: React.ReactNode, options?: IModalOptions): Promise<
 }
 
 /**
+ * Generate a alertDialogId or use the one provided
+ */
+function getAlertDialogId(options?: IAlertDialogOptions) {
+	return options && (isStr(options.alertDialogId) || isNum(options.alertDialogId))
+		? options.alertDialogId
+		: genAlertDialogId();
+}
+
+/**
+ * Merge provided options with the defaults settings and generate the alertDialogId
+ */
+function mergeAlertDialogOptions(sequenceNumber: number, options?: IAlertDialogOptions) {
+	return {
+		...options,
+		alertDialogId: getAlertDialogId(options),
+		sequenceNumber
+	} as INotValidatedAlertDialogProps;
+}
+
+/**
+ * open new alert dialog overlay
+ * @returns alert dialog is pushed. If the container is not mounted or modal is duplicate returns `false`
+ * @example
+ * const pushed = await RMO.pushAlertDialog({title: "dialog title", content: "dialog content"});
+ */
+function _pushAlertDialog(options?: IAlertDialogOptions): Promise<boolean> {
+	return mutex.runExclusive(() => {
+		const mergedOptions = mergeAlertDialogOptions(stack.length, options);
+		const pushed = pushAlertDialog(mergedOptions);
+
+		if (pushed) {
+			stack.push({
+				type: 'alertDialog',
+				containerId: options?.containerId || Default.CONTAINER_ID,
+				alertDialogId: mergedOptions.alertDialogId
+			});
+
+			window.history.pushState(
+				{
+					...window.history.state,
+					rmoStackLength: stack.length
+				},
+				''
+			);
+		}
+
+		return pushed;
+	});
+}
+
+/**
  * Remove(close) overlays programmatically
  *
  * - Remove the last active overlay:
@@ -126,7 +185,7 @@ function _pushModal(content: React.ReactNode, options?: IModalOptions): Promise<
  * RMO.pop(2)
  */
 function pop(count: number = 1) {
-	return mutex.runExclusive(() => multiplePop(-count));
+	return mutex.runExclusive(() => multiplePop(-Math.abs(count)));
 }
 
 /**
@@ -162,6 +221,7 @@ if (typeof window !== 'undefined') {
 
 const RMO = {
 	pushModal: _pushModal,
+	pushAlertDialog: _pushAlertDialog,
 	pop,
 	popAll
 };

@@ -10,7 +10,7 @@ export interface ICloseButtonProps {
 export default function CloseButton({ closeHandler, icon, closeButtonProps }: ICloseButtonProps) {
 	return (
 		<IconButton
-			{...closeButtonProps}
+			{...(closeButtonProps ?? {})}
 			onClick={(e) => {
 				e.stopPropagation();
 				closeHandler();

@@ -21,7 +21,7 @@ export type HeaderProps = Pick<
 export default function ModalHeader({ title, subheader, closeButton, headerProps }: HeaderProps) {
 	return (
 		<CardHeader
-			{...headerProps}
+			{...(headerProps ?? {})}
 			title={title}
 			subheader={subheader}
 			action={closeButton}

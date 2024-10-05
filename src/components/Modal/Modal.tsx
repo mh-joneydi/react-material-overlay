@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React from 'react';
-import { CardContent, Collapse, Dialog, Fade, Grow, Slide, Zoom } from '@mui/material';
+import { CardContent, Dialog } from '@mui/material';
 import { merge } from 'lodash';
 
 import { IModalProps } from '../../types';
 import { isFn } from '../../utils/propValidator';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
+import getPresetTransitionComponent from '../getPresetTransitionComponent';
+import SuspenseFallback from '../SuspenseFallback';
 
 import ModalHeader, { HeaderProps } from './ModalHeader';
 
@@ -40,10 +42,11 @@ const Modal = ({
 	reactSuspenseFallback,
 	closeButtonProps,
 	header,
-	subheader
+	subheader,
+	slotProps
 }: IModalProps) => {
 	const PresetTransitionComponent = React.useMemo(
-		() => (transitionPreset ? getTransitionComponent(transitionPreset) : undefined),
+		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
 		[transitionPreset]
 	);
 
@@ -55,7 +58,7 @@ const Modal = ({
 		closeModal();
 	}
 
-	const content = <React.Suspense fallback={reactSuspenseFallback}>{children}</React.Suspense>;
+	const content = <React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{children}</React.Suspense>;
 
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
@@ -102,7 +105,7 @@ const Modal = ({
 
 	return (
 		<Dialog
-			{...DialogProps}
+			{...(DialogProps ?? {})}
 			PaperComponent={PaperComponent}
 			transitionDuration={transitionDuration}
 			PaperProps={PaperProps}
@@ -117,6 +120,7 @@ const Modal = ({
 			onClose={onClose}
 			classes={classes}
 			slots={slots}
+			slotProps={slotProps}
 			sx={(theme) => ({
 				zIndex: theme.zIndex.modal + sequenceNumber,
 				...merge(
@@ -132,10 +136,12 @@ const Modal = ({
 				<React.Fragment>
 					{Header}
 					<CardContent
-						{...contentWrapperProps}
+						{...(contentWrapperProps ?? {})}
 						sx={(theme) => ({
 							overflow: scroll === 'paper' ? 'auto' : undefined,
-							...(isFn(contentWrapperProps?.sx) ? (contentWrapperProps.sx as Function)(theme) : contentWrapperProps?.sx)
+							...(isFn(contentWrapperProps?.sx)
+								? (contentWrapperProps.sx as Function)(theme)
+								: (contentWrapperProps?.sx ?? {}))
 						})}
 					>
 						{content}
@@ -145,29 +151,5 @@ const Modal = ({
 		</Dialog>
 	);
 };
-
-const getTransitionComponent = (transitionPreset: NonNullable<IModalProps['transitionPreset']>) =>
-	React.forwardRef(function TransitionComponent(props: any, ref) {
-		let PresetTransitionComponent;
-
-		if (transitionPreset === 'slide') {
-			PresetTransitionComponent = Slide;
-		} else if (transitionPreset === 'fade') {
-			PresetTransitionComponent = Fade;
-		} else if (transitionPreset === 'grow') {
-			PresetTransitionComponent = Grow;
-		} else if (transitionPreset === 'collapse') {
-			PresetTransitionComponent = Collapse;
-		} else {
-			PresetTransitionComponent = Zoom;
-		}
-
-		return (
-			<PresetTransitionComponent
-				{...props}
-				ref={ref}
-			/>
-		);
-	});
 
 export default Modal;
