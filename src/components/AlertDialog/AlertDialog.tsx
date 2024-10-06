@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { merge } from 'lodash';
 
 import { IAlertDialogProps } from '../../types';
 import { isFn } from '../../utils/propValidator';
@@ -31,7 +29,6 @@ const AlertDialog = ({
 	TransitionComponent,
 	transitionProps,
 	sx,
-	defaultSx,
 	classes,
 	slots,
 	transitionDuration,
@@ -57,9 +54,9 @@ const AlertDialog = ({
 		closeAlertDialog();
 	}
 
-	const withCloseAlertDialog = (callBack: () => void) => () => {
+	const withCloseAlertDialog = (callBack: () => void) => async () => {
+		await closeAlertDialog();
 		callBack();
-		closeAlertDialog();
 	};
 
 	const defaultActionButtons = (
@@ -117,11 +114,7 @@ const AlertDialog = ({
 			slotProps={slotProps}
 			sx={(theme) => ({
 				zIndex: theme.zIndex.modal + sequenceNumber,
-				...merge(
-					{},
-					isFn(defaultSx) ? (defaultSx as Function)(theme) : defaultSx,
-					isFn(sx) ? (sx as Function)(theme) : sx
-				)
+				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {}))
 			})}
 		>
 			<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>

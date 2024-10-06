@@ -1,13 +1,12 @@
-import { merge } from 'lodash';
-
 import { useModalContainer } from '../../hooks/Modal/useModalContainer';
 import { IModalContainerProps } from '../../types';
+import enhancedMerge from '../../utils/enhancedMerge';
 
 import Modal from './Modal';
 
 interface ModalContainerProps {
 	reactSuspenseFallback?: React.ReactNode;
-	defaultOptions: IModalContainerProps;
+	defaultOptions?: IModalContainerProps;
 }
 
 export const defaultProps: ModalContainerProps = {
@@ -23,9 +22,9 @@ export const defaultProps: ModalContainerProps = {
 };
 
 export default function ModalContainer(props: ModalContainerProps) {
-	const { defaultOptions: options, reactSuspenseFallback } = merge({}, defaultProps, props);
+	const { defaultOptions, reactSuspenseFallback } = enhancedMerge(defaultProps, props);
 
-	const { isModalActive, modalList } = useModalContainer(options);
+	const { isModalActive, modalList } = useModalContainer(defaultOptions!);
 
 	return modalList.map(({ content, props: modalProps }) => {
 		return (

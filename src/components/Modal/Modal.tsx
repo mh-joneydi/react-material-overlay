@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 import React from 'react';
 import { CardContent, Dialog } from '@mui/material';
-import { merge } from 'lodash';
 
 import { IModalProps } from '../../types';
 import { isFn } from '../../utils/propValidator';
@@ -35,7 +33,6 @@ const Modal = ({
 	transitionProps,
 	closeButtonIcon,
 	sx,
-	defaultSx,
 	classes,
 	slots,
 	transitionDuration,
@@ -123,11 +120,7 @@ const Modal = ({
 			slotProps={slotProps}
 			sx={(theme) => ({
 				zIndex: theme.zIndex.modal + sequenceNumber,
-				...merge(
-					{},
-					isFn(defaultSx) ? (defaultSx as Function)(theme) : defaultSx,
-					isFn(sx) ? (sx as Function)(theme) : sx
-				)
+				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {}))
 			})}
 		>
 			{raw ? (

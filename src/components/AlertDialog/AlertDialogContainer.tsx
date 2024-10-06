@@ -1,16 +1,15 @@
-import { merge } from 'lodash';
-
 import { useAlertDialogContainer } from '../../hooks/AlertDialog/useAlertDialogContainer';
 import { IAlertDialogContainerProps } from '../../types';
+import enhancedMerge from '../../utils/enhancedMerge';
 
 import AlertDialog from './AlertDialog';
 
-interface ModalContainerProps {
+interface AlertDialogContainerProps {
 	reactSuspenseFallback?: React.ReactNode;
-	defaultOptions: IAlertDialogContainerProps;
+	defaultOptions?: IAlertDialogContainerProps;
 }
 
-export const defaultProps: ModalContainerProps = {
+export const defaultProps: AlertDialogContainerProps = {
 	defaultOptions: {
 		scroll: 'paper',
 		closeOnBackdropClick: true,
@@ -22,10 +21,10 @@ export const defaultProps: ModalContainerProps = {
 	}
 };
 
-export default function AlertDialogContainer(props: ModalContainerProps) {
-	const { defaultOptions: options, reactSuspenseFallback } = merge({}, defaultProps, props);
+export default function AlertDialogContainer(props: AlertDialogContainerProps) {
+	const { defaultOptions, reactSuspenseFallback } = enhancedMerge(defaultProps, props);
 
-	const { isAlertDialogActive, alertDialogList } = useAlertDialogContainer(options);
+	const { isAlertDialogActive, alertDialogList } = useAlertDialogContainer(defaultOptions!);
 
 	return alertDialogList.map((props) => {
 		return (

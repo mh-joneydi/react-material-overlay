@@ -11,6 +11,7 @@ import type {
 	Notify
 } from '../../types';
 import { Default } from '../../utils/constant';
+import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
 import { popRMOStackState } from '../RMO';
@@ -73,9 +74,9 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 
 		const { modalId } = options;
 
-		const closeModal = () => {
+		const closeModal = async () => {
 			popModal();
-			popRMOStackState({ type: 'modal', containerId: id, modalId });
+			await popRMOStackState({ type: 'modal', containerId: id, modalId });
 		};
 
 		modalCount++;
@@ -89,11 +90,10 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 			...containerProps
 		} = props;
 
-		const { classes, closeButton, header, closeButtonIcon, ...modalOptions } = options;
+		const { classes, closeButton, header, closeButtonIcon, sx, ...modalOptions } = options;
 
 		const modalProps = {
-			defaultSx,
-			...merge({}, containerProps, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
+			...enhancedMerge(containerProps, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
 			modalId,
 			containerId: id,
 			closeModal,
@@ -116,6 +116,17 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 				notify();
 			}
 		} as IModalProps;
+
+		if (defaultSx && sx) {
+			modalProps.sx = (theme) =>
+				merge(
+					{},
+					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
+					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
+				);
+		} else {
+			modalProps.sx = sx || defaultSx;
+		}
 
 		if (isFn(classes)) {
 			modalProps.classes = classes(defaultClasses);

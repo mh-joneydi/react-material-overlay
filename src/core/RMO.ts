@@ -4,8 +4,10 @@ import { isEqual } from 'lodash';
 import {
 	IAlertDialogOptions,
 	Id,
+	ILightboxOptions,
 	IModalOptions,
 	INotValidatedAlertDialogProps,
+	INotValidatedLightboxProps,
 	INotValidatedModalProps
 } from '../types';
 import { Default } from '../utils/constant';
@@ -13,12 +15,15 @@ import { isNum, isStr } from '../utils/propValidator';
 
 import { genAlertDialogId } from './AlertDialog/genAlertDialogId';
 import { popAlertDialog, pushAlertDialog } from './AlertDialog/store';
+import { genLightboxId } from './Lightbox/genLightboxId';
+import { popLightbox, pushLightbox } from './Lightbox/store';
 import { genModalId } from './Modal/genModalId';
 import { popModal, pushModal } from './Modal/store';
 
 type StackItemType =
 	| { type: 'modal'; containerId: Id; modalId: Id }
-	| { type: 'alertDialog'; containerId: Id; alertDialogId: Id };
+	| { type: 'alertDialog'; containerId: Id; alertDialogId: Id }
+	| { type: 'lightbox'; containerId: Id; lightboxId: Id };
 
 const mutex = new Mutex();
 
@@ -29,6 +34,8 @@ function popOverlay(stackItem: StackItemType) {
 		popModal(stackItem.containerId);
 	} else if (stackItem.type === 'alertDialog') {
 		popAlertDialog(stackItem.containerId);
+	} else if (stackItem.type === 'lightbox') {
+		popLightbox(stackItem.containerId);
 	}
 }
 
@@ -60,7 +67,7 @@ async function multiplePop(startIndex: number) {
 }
 
 export function popRMOStackState(params: StackItemType) {
-	mutex.runExclusive(async () => {
+	return mutex.runExclusive(async () => {
 		const lastItem = stack.at(-1);
 
 		if (lastItem) {
@@ -173,6 +180,55 @@ function _pushAlertDialog(options?: IAlertDialogOptions): Promise<boolean> {
 }
 
 /**
+ * Generate a lightboxId or use the one provided
+ */
+function getLightboxId(options?: ILightboxOptions) {
+	return options && (isStr(options.lightboxId) || isNum(options.lightboxId)) ? options.lightboxId : genLightboxId();
+}
+
+/**
+ * Merge provided options with the defaults settings and generate the alertDialogId
+ */
+function mergeLightboxOptions(sequenceNumber: number, options?: ILightboxOptions) {
+	return {
+		...options,
+		lightboxId: getLightboxId(options),
+		sequenceNumber
+	} as INotValidatedLightboxProps;
+}
+
+/**
+ * open new lightbox overlay
+ * @returns lightbox is pushed. If the container is not mounted or modal is duplicate returns `false`
+ * @example
+ * const pushed = await RMO.pushLightbox({});
+ */
+function _pushLightbox(options?: ILightboxOptions): Promise<boolean> {
+	return mutex.runExclusive(() => {
+		const mergedOptions = mergeLightboxOptions(stack.length, options);
+		const pushed = pushLightbox(mergedOptions);
+
+		if (pushed) {
+			stack.push({
+				type: 'lightbox',
+				containerId: options?.containerId || Default.CONTAINER_ID,
+				lightboxId: mergedOptions.lightboxId
+			});
+
+			window.history.pushState(
+				{
+					...window.history.state,
+					rmoStackLength: stack.length
+				},
+				''
+			);
+		}
+
+		return pushed;
+	});
+}
+
+/**
  * Remove(close) overlays programmatically
  *
  * - Remove the last active overlay:
@@ -222,6 +278,7 @@ if (typeof window !== 'undefined') {
 const RMO = {
 	pushModal: _pushModal,
 	pushAlertDialog: _pushAlertDialog,
+	pushLightbox: _pushLightbox,
 	pop,
 	popAll
 };

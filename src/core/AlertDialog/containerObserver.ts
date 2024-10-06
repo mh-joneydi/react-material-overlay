@@ -8,6 +8,7 @@ import type {
 	Notify
 } from '../../types';
 import { Default } from '../../utils/constant';
+import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { isFn } from '../../utils/propValidator';
 import { popRMOStackState } from '../RMO';
@@ -65,19 +66,22 @@ export function createContainerObserver(id: Id, containerProps: IAlertDialogCont
 
 		const { alertDialogId } = options;
 
-		const closeAlertDialog = () => {
+		const closeAlertDialog = async () => {
 			popAlertDialog();
-			popRMOStackState({ type: 'alertDialog', containerId: id, alertDialogId });
+			await popRMOStackState({ type: 'alertDialog', containerId: id, alertDialogId });
 		};
 
 		alertDialogCount++;
 
 		const { sx: defaultSx, classes: defaultClasses, ...containerProps } = props;
 
-		const { classes, ...alertDialogOptions } = options;
+		const { classes, sx, ...alertDialogOptions } = options;
 
 		const alertDialogProps = {
-			...merge({}, containerProps, Object.fromEntries(Object.entries(alertDialogOptions).filter(([, v]) => v != null))),
+			...enhancedMerge(
+				containerProps,
+				Object.fromEntries(Object.entries(alertDialogOptions).filter(([, v]) => v != null))
+			),
 			alertDialogId,
 			containerId: id,
 			closeAlertDialog,
@@ -100,6 +104,17 @@ export function createContainerObserver(id: Id, containerProps: IAlertDialogCont
 				notify();
 			}
 		} as IAlertDialogProps;
+
+		if (defaultSx && sx) {
+			alertDialogProps.sx = (theme) =>
+				merge(
+					{},
+					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
+					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
+				);
+		} else {
+			alertDialogProps.sx = sx || defaultSx;
+		}
 
 		if (isFn(classes)) {
 			alertDialogProps.classes = classes(defaultClasses);

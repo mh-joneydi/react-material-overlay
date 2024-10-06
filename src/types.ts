@@ -1,3 +1,13 @@
+import 'yet-another-react-lightbox/plugins/captions';
+import 'yet-another-react-lightbox/plugins/counter';
+import 'yet-another-react-lightbox/plugins/download';
+import 'yet-another-react-lightbox/plugins/fullscreen';
+import 'yet-another-react-lightbox/plugins/share';
+import 'yet-another-react-lightbox/plugins/slideshow';
+import 'yet-another-react-lightbox/plugins/thumbnails';
+import 'yet-another-react-lightbox/plugins/video';
+import 'yet-another-react-lightbox/plugins/zoom';
+
 import React from 'react';
 import {
 	ButtonProps,
@@ -12,8 +22,10 @@ import {
 	GrowProps,
 	IconButtonProps,
 	SlideProps,
+	Theme,
 	ZoomProps
 } from '@mui/material';
+import { LightboxProps } from 'yet-another-react-lightbox';
 
 import { ICloseButtonProps } from './components/CloseButton';
 import { transitionPreset } from './components/getPresetTransitionComponent';
@@ -131,7 +143,7 @@ export interface IModalContainerProps extends IModalCommonOptions {
 
 export interface IModalOptions extends IModalCommonOptions {
 	/**
-	 * Set a custom `modalId`
+	 * Set a custom `modalId` for prevent duplicating
 	 */
 	modalId?: Id;
 
@@ -180,10 +192,9 @@ export interface IModalProps extends IModalOptions {
 	sequenceNumber: number;
 	show: boolean;
 	children: React.ReactNode;
-	closeModal: () => void;
+	closeModal: () => Promise<void>;
 	deleteModal: () => void;
 	reactSuspenseFallback?: React.ReactNode;
-	defaultSx?: IModalCommonOptions['sx'];
 	classes?: DialogProps['classes'];
 }
 
@@ -193,7 +204,7 @@ export interface INotValidatedModalProps extends Partial<IModalProps> {
 }
 
 export interface IModalContentProps {
-	closeModal: () => void;
+	closeModal: IModalProps['closeModal'];
 	modalProps: IModalProps;
 }
 
@@ -307,7 +318,7 @@ export interface IAlertDialogContainerProps extends IAlertDialogCommonOptions {
 
 export interface IAlertDialogOptions extends IAlertDialogCommonOptions {
 	/**
-	 * Set a custom `alertDialogId`
+	 * Set a custom `alertDialogId` for prevent duplicating
 	 */
 	alertDialogId?: Id;
 
@@ -365,15 +376,185 @@ export interface IAlertDialogProps extends IAlertDialogOptions {
 	containerId: Id;
 	sequenceNumber: number;
 	show: boolean;
-	children: React.ReactNode;
-	closeAlertDialog: () => void;
+	closeAlertDialog: () => Promise<void>;
 	deleteAlertDialog: () => void;
 	reactSuspenseFallback?: React.ReactNode;
-	defaultSx?: IAlertDialogCommonOptions['sx'];
 	classes?: DialogProps['classes'];
 }
 
 export interface INotValidatedAlertDialogProps extends Partial<IAlertDialogProps> {
 	alertDialogId: Id;
+	sequenceNumber: number;
+}
+
+export interface ILightboxCommonOptions {
+	/**
+	 * Set id to handle multiple container
+	 */
+	containerId?: Id;
+
+	on?: LightboxProps['on'];
+	render?: LightboxProps['render'];
+	labels?: LightboxProps['labels'];
+	toolbarOptions?: LightboxProps['toolbar'];
+	carouselOptions?: LightboxProps['carousel'];
+	animationOptions?: LightboxProps['animation'];
+	controllerOptions?: LightboxProps['controller'];
+	noScrollOptions?: LightboxProps['noScroll'];
+
+	/**
+	 * customization styles
+	 *
+	 * The styles that are defined in the container are merged with the styles that you define when pushing new lightbox
+	 */
+	styles?: LightboxProps['styles'] | ((theme: Theme) => LightboxProps['styles']);
+
+	/**
+	 * if `true`, [`Captions plugin`]('https://yet-another-react-lightbox.com/plugins/captions') will be used
+	 * @default true
+	 */
+	captions?: boolean;
+	/**
+	 * [`Captions plugin`]('https://yet-another-react-lightbox.com/plugins/captions') settings
+	 */
+	captionsOptions?: LightboxProps['captions'];
+
+	/**
+	 * if `true`, [`Counter plugin`]('https://yet-another-react-lightbox.com/plugins/counter') will be used
+	 * @default false
+	 */
+	counter?: boolean;
+	/**
+	 * [`Counter plugin`]('https://yet-another-react-lightbox.com/plugins/counter') settings
+	 */
+	counterOptions?: LightboxProps['counter'];
+
+	/**
+	 * if `true`, [`Download plugin`]('https://yet-another-react-lightbox.com/plugins/download') will be used
+	 * @default false
+	 */
+	download?: boolean;
+	/**
+	 * [`Download plugin`]('https://yet-another-react-lightbox.com/plugins/download') settings
+	 */
+	downloadOptions?: LightboxProps['download'];
+
+	/**
+	 * if `true`, [`Fullscreen plugin`]('https://yet-another-react-lightbox.com/plugins/fullscreen') will be used
+	 * @default true
+	 */
+	fullscreen?: boolean;
+	/**
+	 * [`Fullscreen plugin`]('https://yet-another-react-lightbox.com/plugins/fullscreen') settings
+	 */
+	fullscreenOptions?: LightboxProps['fullscreen'];
+
+	/**
+	 * if `true`, [`Share plugin`]('https://yet-another-react-lightbox.com/plugins/share') will be used
+	 * @default false
+	 */
+	share?: boolean;
+	/**
+	 * [`Share plugin`]('https://yet-another-react-lightbox.com/plugins/share') settings
+	 */
+	shareOptions?: LightboxProps['share'];
+
+	/**
+	 * if `true`, [`Slideshow plugin`]('https://yet-another-react-lightbox.com/plugins/slideshow') will be used
+	 * 	@default false
+	 */
+	slideshow?: boolean;
+	/**
+	 * [`Slideshow plugin`]('https://yet-another-react-lightbox.com/plugins/slideshow') settings
+	 */
+	slideshowOptions?: LightboxProps['slideshow'];
+
+	/**
+	 * if `true`, [`Thumbnails plugin`]('https://yet-another-react-lightbox.com/plugins/thumbnails') will be used.
+	 * @default true
+	 */
+	thumbnails?: boolean;
+	/**
+	 * [`Thumbnails plugin`]('https://yet-another-react-lightbox.com/plugins/thumbnails') settings
+	 */
+	thumbnailsOptions?: LightboxProps['thumbnails'];
+
+	/**
+	 * [`Video plugin`]('https://yet-another-react-lightbox.com/plugins/video') settings
+	 * - The video plugin is used by default
+	 */
+	videoOptions?: LightboxProps['video'];
+
+	/**
+	 * if `true`, [`Zoom plugin`]('https://yet-another-react-lightbox.com/plugins/zoom') will be used.
+	 * @default true
+	 */
+	zoom?: boolean;
+	/**
+	 * [`Zoom plugin`]('https://yet-another-react-lightbox.com/plugins/zoom') settings
+	 */
+	zoomOptions?: LightboxProps['zoom'];
+
+	/**
+	 * add extra plugins
+	 */
+	extraPlugins?: LightboxProps['plugins'];
+}
+
+export interface ILightboxContainerProps extends ILightboxCommonOptions {
+	className?: LightboxProps['className'];
+}
+
+export interface ILightboxOptions extends ILightboxCommonOptions {
+	/**
+	 * Set a custom `lightboxId` for prevent duplicating
+	 */
+	lightboxId?: Id;
+
+	/**
+	 * Called when lightbox is mounted.
+	 */
+	onOpen?: () => void;
+
+	/**
+	 * Called when lightbox is unmounted.
+	 */
+	onClose?: () => void;
+
+	slides: LightboxProps['slides'];
+	/**
+	 * Override or extend the styles applied to the component.
+	 *
+	 * - Auto merge with default className that defined in Container:
+	 * ```
+	 * {
+	 *   className: "some-class"
+	 * }
+	 * ```
+	 *
+	 * -  Manual merge or overwrite default className that defined in Container
+	 * ```
+	 * {
+	 *   className: (defaultClassName)=> "overwrited-clsss"
+	 * }
+	 * ```
+	 */
+	className?:
+		| ((defaultClassName: LightboxProps['className']) => LightboxProps['className'])
+		| LightboxProps['className'];
+}
+
+export interface ILightboxProps extends ILightboxOptions {
+	lightboxId: Id;
+	containerId: Id;
+	sequenceNumber: number;
+	show: boolean;
+	closeLightbox: () => Promise<void>;
+	deleteLightbox: () => void;
+	className?: LightboxProps['className'];
+}
+
+export interface INotValidatedLightboxProps extends Partial<ILightboxProps> {
+	lightboxId: Id;
 	sequenceNumber: number;
 }
