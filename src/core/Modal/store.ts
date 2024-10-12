@@ -1,8 +1,9 @@
-import { Id, IModalContainerProps, INotValidatedModalProps, ModalContent, Notify } from '../../types';
+import { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 import { canBeRendered } from '../../utils/propValidator';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
+import { IModalContainerProps, INotValidatedModalProps, ModalContent } from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 

@@ -1,5 +1,5 @@
+import { IModalContainerProps } from '../../core/Modal/types';
 import { useModalContainer } from '../../hooks/Modal/useModalContainer';
-import { IModalContainerProps } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import Modal from './Modal';

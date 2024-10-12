@@ -1,20 +1,14 @@
 import React from 'react';
 import { merge } from 'lodash';
 
-import type {
-	Id,
-	IModal,
-	IModalContainerProps,
-	IModalProps,
-	INotValidatedModalProps,
-	ModalContent,
-	Notify
-} from '../../types';
+import type { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
 import { popRMOStackState } from '../RMO';
+
+import { IModal, IModalContainerProps, IModalProps, INotValidatedModalProps, ModalContent } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 

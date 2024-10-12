@@ -1,21 +1,22 @@
 import { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
+import { canBeRendered } from '../../utils/propValidator';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
-import { IAlertDialogContainerProps, INotValidatedAlertDialogProps } from './types';
+import { BottomSheetContent, IBottomSheetContainerProps, INotValidatedBottomSheetProps } from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 
 const hasContainers = () => containers.size > 0;
 
-export function isAlertDialogActive(id: Id, containerId?: Id) {
+export function isBottomSheetActive(id: Id, containerId?: Id) {
 	if (containerId) {
-		return !!containers.get(containerId)?.isAlertDialogActive(id);
+		return !!containers.get(containerId)?.isBottomSheetActive(id);
 	}
 
 	let isActive = false;
 	containers.forEach((c) => {
-		if (c.isAlertDialogActive(id)) {
+		if (c.isBottomSheetActive(id)) {
 			isActive = true;
 		}
 	});
@@ -23,15 +24,15 @@ export function isAlertDialogActive(id: Id, containerId?: Id) {
 	return isActive;
 }
 
-export function pushAlertDialog(options: INotValidatedAlertDialogProps): boolean {
-	if (!hasContainers()) {
+export function pushBottomSheet(content: BottomSheetContent, options: INotValidatedBottomSheetProps): boolean {
+	if (!canBeRendered(content) || !hasContainers()) {
 		return false;
 	}
 
 	let pushed = false;
 
 	containers.forEach((c) => {
-		const _pushed = c.buildAlertDialog(options);
+		const _pushed = c.buildBottomSheet(content, options);
 
 		if (_pushed) {
 			pushed = true;
@@ -41,11 +42,11 @@ export function pushAlertDialog(options: INotValidatedAlertDialogProps): boolean
 	return pushed;
 }
 
-export function popAlertDialog(containerId: Id) {
-	containers.get(containerId)?.popAlertDialog();
+export function popBottomSheet(containerId: Id) {
+	containers.get(containerId)?.popBottomSheet();
 }
 
-export function registerAlertDialogContainer(props: IAlertDialogContainerProps) {
+export function registerBottomSheetContainer(props: IBottomSheetContainerProps) {
 	const id = props.containerId || Default.CONTAINER_ID;
 
 	return {
@@ -61,7 +62,7 @@ export function registerAlertDialogContainer(props: IAlertDialogContainerProps) 
 				containers.delete(id);
 			};
 		},
-		setProps(p: IAlertDialogContainerProps) {
+		setProps(p: IBottomSheetContainerProps) {
 			containers.get(id)?.setProps(p);
 		},
 		getSnapshot() {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { CardContent, Dialog } from '@mui/material';
 
-import { IModalProps } from '../../types';
+import { IModalProps } from '../../core/Modal/types';
 import { isFn } from '../../utils/propValidator';
-import CloseButton, { ICloseButtonProps } from '../CloseButton';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
 
-import ModalHeader, { HeaderProps } from './ModalHeader';
+import ModalCloseButton, { IModalCloseButtonProps } from './ModalCloseButton';
+import ModalHeader, { ModalHeaderProps } from './ModalHeader';
 
 const Modal = ({
 	children,
@@ -57,7 +57,7 @@ const Modal = ({
 
 	const content = <React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{children}</React.Suspense>;
 
-	const _closeButtonProps: ICloseButtonProps = {
+	const _closeButtonProps: IModalCloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeModal,
 		icon: isFn(closeButtonIcon) ? closeButtonIcon({ transitionPreset, transitionProps, fullScreen }) : closeButtonIcon
@@ -72,10 +72,10 @@ const Modal = ({
 	} else if (React.isValidElement(closeButton)) {
 		Close = React.cloneElement(closeButton, closeButtonProps);
 	} else {
-		Close = CloseButton(_closeButtonProps);
+		Close = ModalCloseButton(_closeButtonProps);
 	}
 
-	const _headerProps: HeaderProps = {
+	const _headerProps: ModalHeaderProps = {
 		closeButton: Close,
 		headerProps,
 		fullScreen,

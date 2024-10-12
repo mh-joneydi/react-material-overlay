@@ -1,5 +1,5 @@
+import { IAlertDialogContainerProps } from '../../core/AlertDialog/types';
 import { useAlertDialogContainer } from '../../hooks/AlertDialog/useAlertDialogContainer';
-import { IAlertDialogContainerProps } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import AlertDialog from './AlertDialog';
@@ -32,7 +32,7 @@ export default function AlertDialogContainer(props: AlertDialogContainerProps) {
 				{...props}
 				reactSuspenseFallback={reactSuspenseFallback}
 				show={isAlertDialogActive(props.alertDialogId, props.containerId)}
-				key={`alert-${props.containerId}-${props.alertDialogId}`}
+				key={`alert-dialog-${props.containerId}-${props.alertDialogId}`}
 			/>
 		);
 	});

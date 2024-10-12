@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-import { IAlertDialogProps } from '../../types';
+import { IAlertDialogProps } from '../../core/AlertDialog/types';
 import { isFn } from '../../utils/propValidator';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';

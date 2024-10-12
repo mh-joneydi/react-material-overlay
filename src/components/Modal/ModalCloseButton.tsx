@@ -1,13 +1,13 @@
 import React from 'react';
 import { IconButton, IconButtonProps } from '@mui/material';
 
-export interface ICloseButtonProps {
+export interface IModalCloseButtonProps {
 	closeHandler: () => void;
 	icon: React.ReactNode;
 	closeButtonProps?: Omit<IconButtonProps, 'onClick'>;
 }
 
-export default function CloseButton({ closeHandler, icon, closeButtonProps }: ICloseButtonProps) {
+export default function ModalCloseButton({ closeHandler, icon, closeButtonProps }: IModalCloseButtonProps) {
 	return (
 		<IconButton
 			{...(closeButtonProps ?? {})}

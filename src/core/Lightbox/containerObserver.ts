@@ -1,11 +1,13 @@
 import clsx from 'clsx';
 import { merge } from 'lodash';
 
-import type { Id, ILightboxContainerProps, ILightboxProps, INotValidatedLightboxProps, Notify } from '../../types';
+import type { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import { isFn } from '../../utils/propValidator';
 import { popRMOStackState } from '../RMO';
+
+import { ILightboxContainerProps, ILightboxProps, INotValidatedLightboxProps } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 

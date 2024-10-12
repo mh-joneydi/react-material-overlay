@@ -1,29 +1,28 @@
 import { Mutex } from 'async-mutex';
 import { isEqual } from 'lodash';
 
-import {
-	IAlertDialogOptions,
-	Id,
-	ILightboxOptions,
-	IModalOptions,
-	INotValidatedAlertDialogProps,
-	INotValidatedLightboxProps,
-	INotValidatedModalProps
-} from '../types';
+import { Id } from '../types';
 import { Default } from '../utils/constant';
 import { isNum, isStr } from '../utils/propValidator';
 
 import { genAlertDialogId } from './AlertDialog/genAlertDialogId';
 import { popAlertDialog, pushAlertDialog } from './AlertDialog/store';
+import { IAlertDialogOptions, INotValidatedAlertDialogProps } from './AlertDialog/types';
+import { genBottomSheetId } from './BottomSheet/genBottomSheetId';
+import { popBottomSheet, pushBottomSheet } from './BottomSheet/store';
+import { BottomSheetContent, IBottomSheetOptions, INotValidatedBottomSheetProps } from './BottomSheet/types';
 import { genLightboxId } from './Lightbox/genLightboxId';
 import { popLightbox, pushLightbox } from './Lightbox/store';
+import { ILightboxOptions, INotValidatedLightboxProps } from './Lightbox/types';
 import { genModalId } from './Modal/genModalId';
 import { popModal, pushModal } from './Modal/store';
+import { IModalOptions, INotValidatedModalProps, ModalContent } from './Modal/types';
 
 type StackItemType =
 	| { type: 'modal'; containerId: Id; modalId: Id }
 	| { type: 'alertDialog'; containerId: Id; alertDialogId: Id }
-	| { type: 'lightbox'; containerId: Id; lightboxId: Id };
+	| { type: 'lightbox'; containerId: Id; lightboxId: Id }
+	| { type: 'bottomSheet'; containerId: Id; bottomSheetId: Id };
 
 const mutex = new Mutex();
 
@@ -36,6 +35,8 @@ function popOverlay(stackItem: StackItemType) {
 		popAlertDialog(stackItem.containerId);
 	} else if (stackItem.type === 'lightbox') {
 		popLightbox(stackItem.containerId);
+	} else if (stackItem.type === 'bottomSheet') {
+		popBottomSheet(stackItem.containerId);
 	}
 }
 
@@ -103,7 +104,7 @@ function mergeModalOptions(sequenceNumber: number, options?: IModalOptions) {
  * @example
  * const pushed = await RMO.pushModal("content");
  */
-function _pushModal(content: React.ReactNode, options?: IModalOptions): Promise<boolean> {
+function _pushModal(content: ModalContent, options?: IModalOptions): Promise<boolean> {
 	return mutex.runExclusive(() => {
 		const mergedOptions = mergeModalOptions(stack.length, options);
 		const pushed = pushModal(content, mergedOptions);
@@ -229,6 +230,57 @@ function _pushLightbox(options?: ILightboxOptions): Promise<boolean> {
 }
 
 /**
+ * Generate a modalId or use the one provided
+ */
+function getBottomSheetId(options?: IBottomSheetOptions) {
+	return options && (isStr(options.bottomSheetId) || isNum(options.bottomSheetId))
+		? options.bottomSheetId
+		: genBottomSheetId();
+}
+
+/**
+ * Merge provided options with the defaults settings and generate the modalId
+ */
+function mergeBottomSheetOptions(sequenceNumber: number, options?: IBottomSheetOptions) {
+	return {
+		...options,
+		bottomSheetId: getBottomSheetId(options),
+		sequenceNumber
+	} as INotValidatedBottomSheetProps;
+}
+
+/**
+ * open new bottom sheet overlay
+ * @returns bottom sheet is pushed. If the container is not mounted or bottom sheet is duplicate returns `false`
+ * @example
+ * const pushed = await RMO.pushBottomSheet("content");
+ */
+function _pushBottomSheet(content: BottomSheetContent, options?: IBottomSheetOptions): Promise<boolean> {
+	return mutex.runExclusive(() => {
+		const mergedOptions = mergeBottomSheetOptions(stack.length, options);
+		const pushed = pushBottomSheet(content, mergedOptions);
+
+		if (pushed) {
+			stack.push({
+				type: 'bottomSheet',
+				containerId: options?.containerId || Default.CONTAINER_ID,
+				bottomSheetId: mergedOptions.bottomSheetId
+			});
+
+			window.history.pushState(
+				{
+					...window.history.state,
+					rmoStackLength: stack.length
+				},
+				''
+			);
+		}
+
+		return pushed;
+	});
+}
+
+/**
  * Remove(close) overlays programmatically
  *
  * - Remove the last active overlay:
@@ -279,6 +331,7 @@ const RMO = {
 	pushModal: _pushModal,
 	pushAlertDialog: _pushAlertDialog,
 	pushLightbox: _pushLightbox,
+	pushBottomSheet: _pushBottomSheet,
 	pop,
 	popAll
 };

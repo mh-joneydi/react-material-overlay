@@ -1,17 +1,13 @@
 import { merge } from 'lodash';
 
-import type {
-	IAlertDialogContainerProps,
-	IAlertDialogProps,
-	Id,
-	INotValidatedAlertDialogProps,
-	Notify
-} from '../../types';
+import type { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { isFn } from '../../utils/propValidator';
 import { popRMOStackState } from '../RMO';
+
+import { IAlertDialogContainerProps, IAlertDialogProps, INotValidatedAlertDialogProps } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 

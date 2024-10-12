@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { isAlertDialogActive, registerAlertDialogContainer } from '../../core/AlertDialog/store';
-import { IAlertDialogContainerProps } from '../../types';
+import { IAlertDialogContainerProps } from '../../core/AlertDialog/types';
 
 export function useAlertDialogContainer(props: IAlertDialogContainerProps) {
 	const { subscribe, getSnapshot, setProps } = React.useRef(registerAlertDialogContainer(props)).current;

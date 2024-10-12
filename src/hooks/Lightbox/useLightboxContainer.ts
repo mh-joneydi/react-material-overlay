@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { isLightboxActive, registerLightboxContainer } from '../../core/Lightbox/store';
-import { ILightboxContainerProps } from '../../types';
+import { ILightboxContainerProps } from '../../core/Lightbox/types';
 
 export function useLightboxContainer(props: ILightboxContainerProps) {
 	const { subscribe, getSnapshot, setProps } = React.useRef(registerLightboxContainer(props)).current;

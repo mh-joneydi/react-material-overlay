@@ -1,7 +1,6 @@
 import React from 'react';
-import createCache from '@emotion/cache';
-import { CacheProvider, css, Global } from '@emotion/react';
-import { alpha, useTheme } from '@mui/material';
+import { css, Global } from '@emotion/react';
+import { useTheme } from '@mui/material';
 import { merge } from 'lodash';
 import { ControllerRef, default as YetAnotherReactLightbox } from 'yet-another-react-lightbox';
 import Captions from 'yet-another-react-lightbox/plugins/captions';
@@ -16,12 +15,9 @@ import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
 import yarlThumbnailsPluginStyles from 'yet-another-react-lightbox/plugins/thumbnails.css';
 import Video from 'yet-another-react-lightbox/plugins/video';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-import yarlStyles from 'yet-another-react-lightbox/styles.css';
 
-import { ILightboxProps } from '../../types';
+import { ILightboxProps } from '../../core/Lightbox/types';
 import { isFn } from '../../utils/propValidator';
-
-const yarlStylesCache = createCache({ key: 'yarl', prepend: true });
 
 const Lightbox = ({
 	show,
@@ -86,30 +82,7 @@ const Lightbox = ({
 	}, [controllerOptions?.ref, show]);
 
 	return (
-		<CacheProvider value={yarlStylesCache}>
-			<Global styles={css(yarlStyles as string)} />
-			<Global
-				styles={{
-					':root': {
-						'--yarl__slide_captions_container_background': theme.palette.background.default,
-						'--yarl__slide_description_color': theme.palette.text.primary,
-						'--yarl__slide_title_color': theme.palette.text.primary,
-						'--yarl__thumbnails_thumbnail_active_border_color': theme.palette.primary.main,
-						'--yarl__thumbnails_thumbnail_border': '1px',
-						'--yarl__thumbnails_thumbnail_background': theme.palette.background.default,
-						'--yarl__thumbnails_thumbnail_border_color': theme.palette.divider,
-						'--yarl__thumbnails_thumbnail_border_radius': `${theme.shape.borderRadius}px`,
-						'--yarl__color_button': theme.palette.text.primary,
-						'--yarl__color_button_active': theme.palette.primary.main,
-						'--yarl__color_button_disabled': theme.palette.text.disabled,
-						'--yarl__color_backdrop': theme.palette.background.default,
-						'--yarl__icon_size': '28px',
-						'--yarl__counter_top': captions ? '48px' : '0px',
-						'--yarl__button_filter': `drop-shadow(2px 2px 8px ${alpha(theme.palette.background.default, 0.5)})`,
-						'--yarl__counter_filter': `drop-shadow(2px 2px 8px ${alpha(theme.palette.background.default, 0.5)})`
-					}
-				}}
-			/>
+		<>
 			{captions ? <Global styles={css(yarlCaptionsPluginStyles as string)} /> : null}
 			{counter ? <Global styles={css(yarlCounterPluginStyles as string)} /> : null}
 			{thumbnails ? <Global styles={css(yarlThumbnailsPluginStyles as string)} /> : null}
@@ -138,7 +111,10 @@ const Lightbox = ({
 				close={() => closeLightbox()}
 				styles={merge({}, _styles, {
 					root: {
-						'--yarl__portal_zindex': theme.zIndex.modal + sequenceNumber
+						'--yarl__portal_zindex': theme.zIndex.modal + sequenceNumber,
+						'--yarl__counter_left': theme.direction === 'ltr' ? 0 : 'unset',
+						'--yarl__counter_right': theme.direction === 'rtl' ? 0 : 'unset',
+						'--yarl__counter_top': captions ? '48px' : 0
 					}
 				})}
 				on={{
@@ -149,7 +125,7 @@ const Lightbox = ({
 					}
 				}}
 			/>
-		</CacheProvider>
+		</>
 	);
 };
 

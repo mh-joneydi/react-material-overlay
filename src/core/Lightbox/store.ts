@@ -1,7 +1,8 @@
-import { Id, ILightboxContainerProps, INotValidatedLightboxProps, Notify } from '../../types';
+import { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
+import { ILightboxContainerProps, INotValidatedLightboxProps } from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 

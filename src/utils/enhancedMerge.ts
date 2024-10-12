@@ -12,7 +12,5 @@ export default function enhancedMerge<TObject, TSource>(object: TObject, source:
 		if (!isPlainObject(objValue) || !isPlainObject(srcValue)) {
 			return srcValue;
 		}
-
-		return undefined;
 	});
 }

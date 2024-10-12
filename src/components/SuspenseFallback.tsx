@@ -26,20 +26,20 @@ const SuspenseFallback = () => {
 				sx={{
 					'@-webkit-keyframes fuse-bouncedelay': {
 						'0%, 80%, 100%': {
-							'-webkit-transform': 'scale(0)'
+							WebkitTransform: 'scale(0)'
 						},
 						'40%': {
-							' -webkit-transform': 'scale(1.0)'
+							WebkitTransform: 'scale(1.0)'
 						}
 					},
 
 					'@keyframes fuse-bouncedelay': {
 						'0%, 80%, 100%': {
-							' -webkit-transform': 'scale(0)',
+							WebkitTransform: 'scale(0)',
 							transform: 'scale(0)'
 						},
 						'40%': {
-							'-webkit-transform': 'scale(1.0)',
+							WebkitTransform: 'scale(1.0)',
 							transform: 'scale(1.0)'
 						}
 					},
@@ -50,16 +50,16 @@ const SuspenseFallback = () => {
 						height: 8,
 						borderRadius: '100%',
 						display: 'inline-block',
-						'-webkit-animation': 'fuse-bouncedelay 1s infinite ease-in-out both',
+						WebkitAnimation: 'fuse-bouncedelay 1s infinite ease-in-out both',
 						animation: 'fuse-bouncedelay 1s infinite ease-in-out both',
 						'&.bounce1': {
-							'-webkit-animation-delay': '-0.32s',
-							'animation-delay': '-0.32s'
+							WebkitAnimationDelay: '-0.32s',
+							animationDelay: '-0.32s'
 						},
 
 						'&.bounce2': {
-							'-webkit-animation-delay': '-0.16s',
-							'animation-delay': '-0.16s'
+							WebkitAnimationDelay: '-0.16s',
+							animationDelay: '-0.16s'
 						}
 					}
 				}}

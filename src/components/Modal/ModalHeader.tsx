@@ -1,9 +1,9 @@
 import React from 'react';
 import { CardHeader } from '@mui/material';
 
-import { IModalProps } from '../../types';
+import { IModalProps } from '../../core/Modal/types';
 
-export type HeaderProps = Pick<
+export type ModalHeaderProps = Pick<
 	IModalProps,
 	| 'title'
 	| 'subheader'
@@ -18,7 +18,7 @@ export type HeaderProps = Pick<
 	closeButton?: React.ReactNode;
 };
 
-export default function ModalHeader({ title, subheader, closeButton, headerProps }: HeaderProps) {
+export default function ModalHeader({ title, subheader, closeButton, headerProps }: ModalHeaderProps) {
 	return (
 		<CardHeader
 			{...(headerProps ?? {})}
