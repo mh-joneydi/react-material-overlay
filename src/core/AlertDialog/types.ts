@@ -36,10 +36,6 @@ export type IFrequentlyUsedDialogProps = Pick<
 
 export interface IAlertDialogCommonOptions extends IFrequentlyUsedDialogProps {
 	/**
-	 * Set id to handle multiple container
-	 */
-	containerId?: Id;
-	/**
 	 * ok action button label
 	 *
 	 * @default "ok"
@@ -124,43 +120,56 @@ export interface IAlertDialogCommonOptions extends IFrequentlyUsedDialogProps {
 	 *  @see {@link https://mui.com/material-ui/api/dialog-actions/#props} for more details.
 	 */
 	DialogActionsProps?: Omit<DialogActionsProps, 'children'>;
+	/**
+	 * Set custom React Suspense Fallback UI instead default for lazy contents
+	 */
+	reactSuspenseFallback?: React.ReactNode;
 }
 
-export interface IAlertDialogContainerProps extends IAlertDialogCommonOptions {
+export interface IAlertDialogDefaultOptions extends IAlertDialogCommonOptions {
 	classes?: DialogProps['classes'];
+}
+
+export interface IAlertDialogContainerProps {
+	/**
+	 * Set id to handle multiple container
+	 */
+	containerId?: Id;
+	/**
+	 * set default options for modals
+	 */
+	defaultOptions: IAlertDialogDefaultOptions;
 }
 
 export interface IAlertDialogOptions extends IAlertDialogCommonOptions {
 	/**
+	 * container id to handle multiple container
+	 */
+	containerId?: Id;
+	/**
 	 * Set a custom `alertDialogId` for prevent duplicating
 	 */
 	alertDialogId?: Id;
-
 	/**
 	 * alert dialog content
 	 */
 	content?: React.ReactNode;
-
 	/**
 	 * alert dialog title
 	 */
 	title?: React.ReactNode;
-
 	/**
 	 * Called when alert dialog is mounted.
 	 */
 	onOpen?: () => void;
-
 	/**
 	 * Called when alert dialog is unmounted.
 	 */
 	onClose?: () => void;
-
 	/**
 	 * Called when cancel button clicked
 	 */
 	onConfirmCancel?: () => void;
-
 	/**
 	 * Called when ok button clicked
 	 */
@@ -188,15 +197,14 @@ export interface IAlertDialogOptions extends IAlertDialogCommonOptions {
 export interface IAlertDialogProps extends IAlertDialogOptions {
 	alertDialogId: Id;
 	containerId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 	show: boolean;
 	closeAlertDialog: () => Promise<void>;
 	deleteAlertDialog: () => void;
-	reactSuspenseFallback?: React.ReactNode;
 	classes?: DialogProps['classes'];
 }
 
 export interface INotValidatedAlertDialogProps extends Partial<IAlertDialogProps> {
 	alertDialogId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 }

@@ -4,16 +4,12 @@ import { alpha, GlobalStyles } from '@mui/material';
 import yarlStyles from 'yet-another-react-lightbox/styles.css';
 
 import { ILightboxContainerProps } from '../../core/Lightbox/types';
-import { useLightboxContainer } from '../../hooks/Lightbox/useLightboxContainer';
+import { useLightboxContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import Lightbox from './Lightbox';
 
-interface LightboxContainerProps {
-	defaultOptions?: ILightboxContainerProps;
-}
-
-export const defaultProps: LightboxContainerProps = {
+export const defaultProps: ILightboxContainerProps = {
 	defaultOptions: {
 		zoom: true,
 		zoomOptions: {
@@ -30,10 +26,10 @@ export const defaultProps: LightboxContainerProps = {
 
 const yarlStylesCache = createCache({ key: 'yarl', prepend: true });
 
-export default function LightboxContainer(props: LightboxContainerProps) {
-	const { defaultOptions } = enhancedMerge(defaultProps, props);
+export default function LightboxContainer(props: Partial<ILightboxContainerProps>) {
+	const containerProps = enhancedMerge(defaultProps, props);
 
-	const { isLightboxActive, lightboxList } = useLightboxContainer(defaultOptions!);
+	const { isLightboxActive, lightboxList } = useLightboxContainer(containerProps);
 
 	return (
 		<CacheProvider value={yarlStylesCache}>

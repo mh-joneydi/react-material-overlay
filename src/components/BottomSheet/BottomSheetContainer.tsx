@@ -1,21 +1,15 @@
-import React from 'react';
 import rsbsStyles from 'react-spring-bottom-sheet/dist/style.css';
 import createCache from '@emotion/cache';
 import { CacheProvider, css, Global } from '@emotion/react';
 import { GlobalStyles } from '@mui/material';
 
 import { IBottomSheetContainerProps } from '../../core/BottomSheet/types';
-import { useBottomSheetContainer } from '../../hooks/BottomSheet/useBottomSheetContainer';
+import { useBottomSheetContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import BottomSheet from './BottomSheet';
 
-interface BottomSheetContainer {
-	reactSuspenseFallback?: React.ReactNode;
-	defaultOptions?: IBottomSheetContainerProps;
-}
-
-export const defaultProps: BottomSheetContainer = {
+export const defaultProps: IBottomSheetContainerProps = {
 	defaultOptions: {
 		initialFocusRef: false
 	}
@@ -23,10 +17,10 @@ export const defaultProps: BottomSheetContainer = {
 
 const rsbsStylesCache = createCache({ key: 'rsbs', prepend: true });
 
-export default function ModalContainer(props: BottomSheetContainer) {
-	const { defaultOptions, reactSuspenseFallback } = enhancedMerge(defaultProps, props);
+export default function ModalContainer(props: Partial<IBottomSheetContainerProps>) {
+	const containerProps = enhancedMerge(defaultProps, props);
 
-	const { isBottomSheetActive, bottomSheetList } = useBottomSheetContainer(defaultOptions!);
+	const { isBottomSheetActive, bottomSheetList } = useBottomSheetContainer(containerProps);
 
 	return (
 		<CacheProvider value={rsbsStylesCache}>
@@ -43,7 +37,6 @@ export default function ModalContainer(props: BottomSheetContainer) {
 				return (
 					<BottomSheet
 						{...bottomSheetProps}
-						reactSuspenseFallback={reactSuspenseFallback}
 						show={isBottomSheetActive(bottomSheetProps.bottomSheetId, bottomSheetProps.containerId)}
 						key={`bottom-sheet-${bottomSheetProps.containerId}-${bottomSheetProps.bottomSheetId}`}
 					>

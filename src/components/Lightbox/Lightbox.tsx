@@ -16,6 +16,7 @@ import yarlThumbnailsPluginStyles from 'yet-another-react-lightbox/plugins/thumb
 import Video from 'yet-another-react-lightbox/plugins/video';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 
+import { RmoStack } from '../../core';
 import { ILightboxProps } from '../../core/Lightbox/types';
 import { isFn } from '../../utils/propValidator';
 
@@ -23,7 +24,6 @@ const Lightbox = ({
 	show,
 	closeLightbox,
 	deleteLightbox,
-	sequenceNumber,
 	captions,
 	counter,
 	download,
@@ -52,8 +52,11 @@ const Lightbox = ({
 	animationOptions,
 	on,
 	slides,
-	extraPlugins
+	extraPlugins,
+	rmoStackId
 }: ILightboxProps) => {
+	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
+
 	const theme = useTheme();
 	const plugins = React.useMemo(
 		() =>
@@ -108,15 +111,19 @@ const Lightbox = ({
 				open
 				controller={{ ref: controllerRef, ...(controllerOptions ?? {}) }}
 				plugins={plugins}
-				close={() => closeLightbox()}
-				styles={merge({}, _styles, {
-					root: {
-						'--yarl__portal_zindex': theme.zIndex.modal + sequenceNumber,
-						'--yarl__counter_left': theme.direction === 'ltr' ? 0 : 'unset',
-						'--yarl__counter_right': theme.direction === 'rtl' ? 0 : 'unset',
-						'--yarl__counter_top': captions ? '48px' : 0
-					}
-				})}
+				close={closeLightbox}
+				styles={merge(
+					{},
+					{
+						root: {
+							'--yarl__portal_zindex': theme.zIndex.modal + sequenceNumber,
+							'--yarl__counter_left': theme.direction === 'ltr' ? 0 : 'unset',
+							'--yarl__counter_right': theme.direction === 'rtl' ? 0 : 'unset',
+							'--yarl__counter_top': captions ? '48px' : 0
+						}
+					},
+					_styles
+				)}
 				on={{
 					...(on ?? {}),
 					exited() {

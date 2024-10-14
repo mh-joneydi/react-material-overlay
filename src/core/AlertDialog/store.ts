@@ -2,7 +2,12 @@ import { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
-import { IAlertDialogContainerProps, INotValidatedAlertDialogProps } from './types';
+import {
+	IAlertDialogContainerProps,
+	IAlertDialogDefaultOptions,
+	IAlertDialogProps,
+	INotValidatedAlertDialogProps
+} from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 
@@ -23,34 +28,36 @@ export function isAlertDialogActive(id: Id, containerId?: Id) {
 	return isActive;
 }
 
-export function pushAlertDialog(options: INotValidatedAlertDialogProps): boolean {
+export function buildAlertDialog(options: INotValidatedAlertDialogProps) {
 	if (!hasContainers()) {
-		return false;
+		throw new Error('there is no container for push new alert dialog!');
 	}
 
-	let pushed = false;
+	const id = options.containerId || Default.CONTAINER_ID;
 
-	containers.forEach((c) => {
-		const _pushed = c.buildAlertDialog(options);
+	const container = containers.get(id);
 
-		if (_pushed) {
-			pushed = true;
-		}
-	});
+	if (!container) {
+		throw new Error(`there is no container with id: ${id} for push new alert dialog!`);
+	}
 
-	return pushed;
+	return container.buildAlertDialog(options);
 }
 
-export function popAlertDialog(containerId: Id) {
+export function pushAlertDialog(alertDialog: IAlertDialogProps) {
+	containers.get(alertDialog.containerId)?.pushAlertDialog(alertDialog);
+}
+
+export function popAlertDialog(containerId: Id = Default.CONTAINER_ID) {
 	containers.get(containerId)?.popAlertDialog();
 }
 
-export function registerAlertDialogContainer(props: IAlertDialogContainerProps) {
-	const id = props.containerId || Default.CONTAINER_ID;
+export function registerAlertDialogContainer({ defaultOptions, containerId }: IAlertDialogContainerProps) {
+	const id = containerId || Default.CONTAINER_ID;
 
 	return {
 		subscribe(notify: Notify) {
-			const container = createContainerObserver(id, props);
+			const container = createContainerObserver(id, defaultOptions);
 
 			containers.set(id, container);
 
@@ -61,8 +68,8 @@ export function registerAlertDialogContainer(props: IAlertDialogContainerProps) 
 				containers.delete(id);
 			};
 		},
-		setProps(p: IAlertDialogContainerProps) {
-			containers.get(id)?.setProps(p);
+		setDefaultOptions(d: IAlertDialogDefaultOptions) {
+			containers.get(id)?.setDefaultOptions(d);
 		},
 		getSnapshot() {
 			return containers.get(id)?.getSnapshot();

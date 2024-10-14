@@ -1,29 +1,29 @@
 import React from 'react';
 import clsx from 'clsx';
+import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
-import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
-import { popRMOStackState } from '../RMO';
+import RmoStack from '../RmoStack';
 
 import {
 	BottomSheetContent,
 	BottomSheetContentProps,
 	IBottomSheet,
-	IBottomSheetContainerProps,
 	IBottomSheetCustomRenderProps,
+	IBottomSheetDefaultOptions,
 	IBottomSheetProps,
 	INotValidatedBottomSheetProps
 } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
-export function createContainerObserver(id: Id, containerProps: IBottomSheetContainerProps) {
+export function createContainerObserver(id: Id, containerDefaultOptions: IBottomSheetDefaultOptions) {
 	let bottomSheetCount = 0;
 	let activeBottomSheets: Id[] = [];
 	let snapshot: IBottomSheet[] = [];
-	let props = containerProps;
+	let defaultOptions = containerDefaultOptions;
 
 	const bottomSheets = new Map<Id, IBottomSheet>();
 	const listeners = new Set<Notify>();
@@ -38,12 +38,10 @@ export function createContainerObserver(id: Id, containerProps: IBottomSheetCont
 		listeners.forEach((cb) => cb());
 	};
 
-	const shouldIgnoreBottomSheet = ({ containerId, bottomSheetId }: INotValidatedBottomSheetProps) => {
-		const containerMismatch = containerId ? containerId !== id : id !== Default.CONTAINER_ID;
-		const isDuplicate = bottomSheets.has(bottomSheetId);
-
-		return containerMismatch || isDuplicate;
-	};
+	function shouldIgnorePop(bottomSheetId: Id) {
+		const lastActiveId = activeBottomSheets.at(-1);
+		return lastActiveId !== bottomSheetId;
+	}
 
 	const popBottomSheet = () => {
 		activeBottomSheets = activeBottomSheets.slice(0, -1);
@@ -63,23 +61,33 @@ export function createContainerObserver(id: Id, containerProps: IBottomSheetCont
 		}
 	};
 
-	const buildBottomSheet = (content: BottomSheetContent, options: INotValidatedBottomSheetProps): boolean => {
-		if (shouldIgnoreBottomSheet(options)) {
-			return false;
+	const buildBottomSheet = (content: BottomSheetContent, options: INotValidatedBottomSheetProps) => {
+		if (bottomSheets.has(options.bottomSheetId)) {
+			throw new Error('bottom sheet is duplicated!');
 		}
 
-		const { bottomSheetId } = options;
+		const { bottomSheetId, rmoStackId } = options;
 
 		const closeBottomSheet = async () => {
+			if (shouldIgnorePop(bottomSheetId)) {
+				return;
+			}
+
 			popBottomSheet();
-			await popRMOStackState({ type: 'bottomSheet', containerId: id, bottomSheetId });
+			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
 		};
 
 		bottomSheetCount++;
 
-		const { className: defaultClassName, footer: defaultFooter, sibling: defaultSibling, ...containerProps } = props;
+		const {
+			sx: defaultSx,
+			className: defaultClassName,
+			footer: defaultFooter,
+			sibling: defaultSibling,
+			...containerProps
+		} = defaultOptions;
 
-		const { className, footer, sibling, ...bottomSheetOptions } = options;
+		const { sx, className, footer, sibling, ...bottomSheetOptions } = options;
 
 		const bottomSheetProps = {
 			...enhancedMerge(
@@ -108,6 +116,17 @@ export function createContainerObserver(id: Id, containerProps: IBottomSheetCont
 				notify();
 			}
 		} as IBottomSheetProps;
+
+		if (defaultSx && sx) {
+			bottomSheetProps.sx = (theme) =>
+				merge(
+					{},
+					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
+					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
+				);
+		} else {
+			bottomSheetProps.sx = sx || defaultSx;
+		}
 
 		if (isFn(className)) {
 			bottomSheetProps.className = className(defaultClassName);
@@ -162,22 +181,21 @@ export function createContainerObserver(id: Id, containerProps: IBottomSheetCont
 			props: bottomSheetProps
 		};
 
-		pushBottomSheet(activeBottomSheet);
-
-		return true;
+		return activeBottomSheet;
 	};
 
 	return {
 		id,
-		props,
+		defaultOptions,
 		observe,
 		popBottomSheet,
+		pushBottomSheet,
 		get bottomSheetCount() {
 			return bottomSheetCount;
 		},
 		buildBottomSheet,
-		setProps(p: IBottomSheetContainerProps) {
-			props = p;
+		setDefaultOptions(d: IBottomSheetDefaultOptions) {
+			defaultOptions = d;
 		},
 		isBottomSheetActive: (id: Id) => activeBottomSheets.some((v) => v === id),
 		getSnapshot: () => snapshot

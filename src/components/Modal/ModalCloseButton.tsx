@@ -10,6 +10,7 @@ export interface IModalCloseButtonProps {
 export default function ModalCloseButton({ closeHandler, icon, closeButtonProps }: IModalCloseButtonProps) {
 	return (
 		<IconButton
+			aria-label="close"
 			{...(closeButtonProps ?? {})}
 			onClick={(e) => {
 				e.stopPropagation();

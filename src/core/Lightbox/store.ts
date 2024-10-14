@@ -2,7 +2,7 @@ import { Id, Notify } from '../../types';
 import { Default } from '../../utils/constant';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
-import { ILightboxContainerProps, INotValidatedLightboxProps } from './types';
+import { ILightboxContainerProps, ILightboxDefaultOptions, ILightboxProps, INotValidatedLightboxProps } from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 
@@ -23,34 +23,36 @@ export function isLightboxActive(id: Id, containerId?: Id) {
 	return isActive;
 }
 
-export function pushLightbox(options: INotValidatedLightboxProps): boolean {
+export function buildLightbox(options: INotValidatedLightboxProps) {
 	if (!hasContainers()) {
-		return false;
+		throw new Error('there is no container for push new lightbox!');
 	}
 
-	let pushed = false;
+	const id = options.containerId || Default.CONTAINER_ID;
 
-	containers.forEach((c) => {
-		const _pushed = c.buildLightbox(options);
+	const container = containers.get(id);
 
-		if (_pushed) {
-			pushed = true;
-		}
-	});
+	if (!container) {
+		throw new Error(`there is no container with id: ${id} for push new lightbox!`);
+	}
 
-	return pushed;
+	return container.buildLightbox(options);
 }
 
-export function popLightbox(containerId: Id) {
+export function pushLightbox(lightbox: ILightboxProps) {
+	containers.get(lightbox.containerId)?.pushLightbox(lightbox);
+}
+
+export function popLightbox(containerId: Id = Default.CONTAINER_ID) {
 	containers.get(containerId)?.popLightbox();
 }
 
-export function registerLightboxContainer(props: ILightboxContainerProps) {
-	const id = props.containerId || Default.CONTAINER_ID;
+export function registerLightboxContainer({ defaultOptions, containerId }: ILightboxContainerProps) {
+	const id = containerId || Default.CONTAINER_ID;
 
 	return {
 		subscribe(notify: Notify) {
-			const container = createContainerObserver(id, props);
+			const container = createContainerObserver(id, defaultOptions);
 
 			containers.set(id, container);
 
@@ -61,8 +63,8 @@ export function registerLightboxContainer(props: ILightboxContainerProps) {
 				containers.delete(id);
 			};
 		},
-		setProps(p: ILightboxContainerProps) {
-			containers.get(id)?.setProps(p);
+		setDefaultOptions(d: ILightboxDefaultOptions) {
+			containers.get(id)?.setDefaultOptions(d);
 		},
 		getSnapshot() {
 			return containers.get(id)?.getSnapshot();

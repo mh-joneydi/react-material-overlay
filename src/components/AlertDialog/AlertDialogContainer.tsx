@@ -1,15 +1,10 @@
 import { IAlertDialogContainerProps } from '../../core/AlertDialog/types';
-import { useAlertDialogContainer } from '../../hooks/AlertDialog/useAlertDialogContainer';
+import { useAlertDialogContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import AlertDialog from './AlertDialog';
 
-interface AlertDialogContainerProps {
-	reactSuspenseFallback?: React.ReactNode;
-	defaultOptions?: IAlertDialogContainerProps;
-}
-
-export const defaultProps: AlertDialogContainerProps = {
+export const defaultProps: IAlertDialogContainerProps = {
 	defaultOptions: {
 		scroll: 'paper',
 		closeOnBackdropClick: true,
@@ -21,16 +16,15 @@ export const defaultProps: AlertDialogContainerProps = {
 	}
 };
 
-export default function AlertDialogContainer(props: AlertDialogContainerProps) {
-	const { defaultOptions, reactSuspenseFallback } = enhancedMerge(defaultProps, props);
+export default function AlertDialogContainer(props: Partial<IAlertDialogContainerProps>) {
+	const containerProps = enhancedMerge(defaultProps, props);
 
-	const { isAlertDialogActive, alertDialogList } = useAlertDialogContainer(defaultOptions!);
+	const { isAlertDialogActive, alertDialogList } = useAlertDialogContainer(containerProps);
 
 	return alertDialogList.map((props) => {
 		return (
 			<AlertDialog
 				{...props}
-				reactSuspenseFallback={reactSuspenseFallback}
 				show={isAlertDialogActive(props.alertDialogId, props.containerId)}
 				key={`alert-dialog-${props.containerId}-${props.alertDialogId}`}
 			/>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BottomSheet as RSBottomSheet } from 'react-spring-bottom-sheet';
 import { GlobalStyles } from '@mui/material';
 
+import { RmoStack } from '../../core';
 import { BottomSheetRef, IBottomSheetProps } from '../../core/BottomSheet/types';
 import SuspenseFallback from '../SuspenseFallback';
 
@@ -12,7 +13,6 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		deleteBottomSheet,
 		closeBottomSheet,
 		reactSuspenseFallback,
-		sequenceNumber,
 		bottomSheetId,
 		containerId,
 		blocking,
@@ -31,18 +31,25 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		sibling,
 		skipInitialTransition,
 		snapPoints,
-		BottomSheetProps
+		BottomSheetProps,
+		rmoStackId,
+		sx
 	},
 	ref
 ) {
+	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
 	const rsbsId = `rsbs-${containerId}-${bottomSheetId}`;
+
 	return (
 		<>
 			<GlobalStyles
 				styles={(theme) => ({
 					[`#${rsbsId} [data-rsbs-overlay], #${rsbsId} [data-rsbs-backdrop], #${rsbsId}[data-rsbs-root]:after`]: {
 						zIndex: theme.zIndex.modal + sequenceNumber
-					}
+					},
+					...(!!sx && {
+						[`#${rsbsId}`]: theme.unstable_sx(sx)
+					})
 				})}
 			/>
 

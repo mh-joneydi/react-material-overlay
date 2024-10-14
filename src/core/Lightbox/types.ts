@@ -29,10 +29,6 @@ export type LightboxThumbnailsRef = ThumbnailsRef;
 export type LightboxFullscreenRef = FullscreenRef;
 
 export interface ILightboxCommonOptions {
-	/**
-	 * Set id to handle multiple container
-	 */
-	containerId?: Id;
 	/** lifecycle callbacks */
 	on?: LightboxProps['on'];
 	/** custom render functions */
@@ -138,28 +134,37 @@ export interface ILightboxCommonOptions {
 	extraPlugins?: LightboxProps['plugins'];
 }
 
-export interface ILightboxContainerProps extends ILightboxCommonOptions {
+export interface ILightboxDefaultOptions extends ILightboxCommonOptions {
 	/** CSS class of the lightbox root element */
 	className?: LightboxProps['className'];
 }
 
-export interface ILightboxOptions extends ILightboxCommonOptions {
+export interface ILightboxContainerProps {
 	/**
-	 * Set a custom `lightboxId` for prevent duplicating
+	 * Set id to handle multiple container
 	 */
-	lightboxId?: Id;
+	containerId?: Id;
+	/**
+	 * set default options for modals
+	 */
+	defaultOptions: ILightboxDefaultOptions;
+}
 
+export interface ILightboxOptions extends ILightboxCommonOptions {
+	/** slides to display in the lightbox */
+	slides: LightboxProps['slides'];
+	/**
+	 * container id to handle multiple container
+	 */
+	containerId?: Id;
 	/**
 	 * Called when lightbox is mounted.
 	 */
 	onOpen?: () => void;
-
 	/**
 	 * Called when lightbox is unmounted.
 	 */
 	onClose?: () => void;
-
-	slides: LightboxProps['slides'];
 	/**
 	 * Override or extend the styles applied to the component.
 	 *
@@ -185,7 +190,7 @@ export interface ILightboxOptions extends ILightboxCommonOptions {
 export interface ILightboxProps extends ILightboxOptions {
 	lightboxId: Id;
 	containerId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 	show: boolean;
 	closeLightbox: () => Promise<void>;
 	deleteLightbox: () => void;
@@ -194,5 +199,5 @@ export interface ILightboxProps extends ILightboxOptions {
 
 export interface INotValidatedLightboxProps extends Partial<ILightboxProps> {
 	lightboxId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 }

@@ -36,7 +36,7 @@ export default {
 		terser({
 			output: { comments: false },
 			compress: {
-				drop_console: true
+				drop_console: false
 			}
 		})
 	],

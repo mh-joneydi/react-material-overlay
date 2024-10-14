@@ -1,6 +1,7 @@
 import React from 'react';
 import { CardContent, Dialog } from '@mui/material';
 
+import { RmoStack } from '../../core';
 import { IModalProps } from '../../core/Modal/types';
 import { isFn } from '../../utils/propValidator';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
@@ -15,7 +16,6 @@ const Modal = ({
 	deleteModal,
 	closeModal,
 	title,
-	sequenceNumber,
 	raw,
 	fullScreen,
 	maxWidth,
@@ -40,8 +40,10 @@ const Modal = ({
 	closeButtonProps,
 	header,
 	subheader,
-	slotProps
+	slotProps,
+	rmoStackId
 }: IModalProps) => {
+	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
 		[transitionPreset]
@@ -119,8 +121,8 @@ const Modal = ({
 			slots={slots}
 			slotProps={slotProps}
 			sx={(theme) => ({
-				zIndex: theme.zIndex.modal + sequenceNumber,
-				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {}))
+				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {})),
+				zIndex: theme.zIndex.modal + sequenceNumber
 			})}
 		>
 			{raw ? (

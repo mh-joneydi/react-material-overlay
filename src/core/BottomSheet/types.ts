@@ -1,5 +1,6 @@
 import { ForwardedRef } from 'react';
 import { BottomSheetProps, BottomSheetRef as RSBSBottomSheetRef } from 'react-spring-bottom-sheet';
+import { SxProps, Theme } from '@mui/material';
 
 import { Id } from '../../types';
 
@@ -22,7 +23,7 @@ export type RSBSProps = Pick<
 
 export interface IBottomSheetCustomRenderProps {
 	closeBottomSheet: IBottomSheetProps['closeBottomSheet'];
-	bottomSheetProps: RSBSProps & Pick<IBottomSheetProps, 'bottomSheetId' | 'containerId' | 'sequenceNumber'>;
+	bottomSheetProps: RSBSProps & Pick<IBottomSheetProps, 'bottomSheetId' | 'containerId'>;
 }
 
 export type BottomSheetContentProps = IBottomSheetCustomRenderProps;
@@ -32,10 +33,6 @@ export type BottomSheetSiblingProps = IBottomSheetCustomRenderProps;
 export type BottomSheetRef = RSBSBottomSheetRef;
 
 export interface IBottomSheetCommonOptions extends RSBSProps {
-	/**
-	 * Set id to handle multiple container
-	 */
-	containerId?: Id;
 	/**
 	 * Similar to children, but renders next to the overlay element rather than inside it.
 	 * Useful for things that are position:fixed and need to overlay the backdrop and still be interactive
@@ -58,24 +55,41 @@ export interface IBottomSheetCommonOptions extends RSBSProps {
 	 * Props for the BottomSheet component (root element) to more cutomization.
 	 */
 	BottomSheetProps?: Omit<React.PropsWithoutRef<JSX.IntrinsicElements['div']>, 'children' | 'id' | 'className'>;
+	/**
+	 * allows defining additional CSS styles in root element.
+	 */
+	sx?: SxProps<Theme>;
 }
 
-export interface IBottomSheetContainerProps extends IBottomSheetCommonOptions {
+export interface IBottomSheetDefaultOptions extends IBottomSheetCommonOptions {
 	/** CSS class of the BottomSheet root element */
 	className?: BottomSheetProps['className'];
 }
 
+export interface IBottomSheetContainerProps {
+	/**
+	 * Set id to handle multiple container
+	 */
+	containerId?: Id;
+	/**
+	 * set default options for modals
+	 */
+	defaultOptions: IBottomSheetDefaultOptions;
+}
+
 export interface IBottomSheetOptions extends IBottomSheetCommonOptions {
+	/**
+	 * container id to handle multiple container
+	 */
+	containerId?: Id;
 	/**
 	 * Set a custom `bottomSheetId` for prevent duplicating
 	 */
 	bottomSheetId?: Id;
-
 	/**
 	 * Called when bottomSheet is mounted.
 	 */
 	onOpen?: () => void;
-
 	/**
 	 * Called when bottomSheet is unmounted.
 	 */
@@ -103,7 +117,7 @@ export interface IBottomSheetOptions extends IBottomSheetCommonOptions {
 export interface IBottomSheetProps extends IBottomSheetOptions {
 	bottomSheetId: Id;
 	containerId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 	show: boolean;
 	children: React.ReactNode;
 	closeBottomSheet: () => Promise<void>;
@@ -116,7 +130,7 @@ export interface IBottomSheetProps extends IBottomSheetOptions {
 
 export interface INotValidatedBottomSheetProps extends Partial<IBottomSheetOptions> {
 	bottomSheetId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 }
 
 export type BottomSheetContent = React.ReactNode | ((props: BottomSheetContentProps) => React.ReactNode);

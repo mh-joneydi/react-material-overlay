@@ -3,7 +3,13 @@ import { Default } from '../../utils/constant';
 import { canBeRendered } from '../../utils/propValidator';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
-import { BottomSheetContent, IBottomSheetContainerProps, INotValidatedBottomSheetProps } from './types';
+import {
+	BottomSheetContent,
+	IBottomSheet,
+	IBottomSheetContainerProps,
+	IBottomSheetDefaultOptions,
+	INotValidatedBottomSheetProps
+} from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 
@@ -24,34 +30,40 @@ export function isBottomSheetActive(id: Id, containerId?: Id) {
 	return isActive;
 }
 
-export function pushBottomSheet(content: BottomSheetContent, options: INotValidatedBottomSheetProps): boolean {
-	if (!canBeRendered(content) || !hasContainers()) {
-		return false;
+export function buildBottomSheet(content: BottomSheetContent, options: INotValidatedBottomSheetProps) {
+	if (!canBeRendered(content)) {
+		throw new Error('bottom sheet contnet can not be rendered!');
 	}
 
-	let pushed = false;
+	if (!hasContainers()) {
+		throw new Error('there is no container for push new bottom sheet!');
+	}
 
-	containers.forEach((c) => {
-		const _pushed = c.buildBottomSheet(content, options);
+	const id = options.containerId || Default.CONTAINER_ID;
 
-		if (_pushed) {
-			pushed = true;
-		}
-	});
+	const container = containers.get(id);
 
-	return pushed;
+	if (!container) {
+		throw new Error(`there is no container with id: ${id} for push new bottom sheet!`);
+	}
+
+	return container.buildBottomSheet(content, options);
 }
 
-export function popBottomSheet(containerId: Id) {
+export function pushBottomSheet(bottomSheet: IBottomSheet) {
+	containers.get(bottomSheet.props.containerId)?.pushBottomSheet(bottomSheet);
+}
+
+export function popBottomSheet(containerId: Id = Default.CONTAINER_ID) {
 	containers.get(containerId)?.popBottomSheet();
 }
 
-export function registerBottomSheetContainer(props: IBottomSheetContainerProps) {
-	const id = props.containerId || Default.CONTAINER_ID;
+export function registerBottomSheetContainer({ defaultOptions, containerId }: IBottomSheetContainerProps) {
+	const id = containerId || Default.CONTAINER_ID;
 
 	return {
 		subscribe(notify: Notify) {
-			const container = createContainerObserver(id, props);
+			const container = createContainerObserver(id, defaultOptions);
 
 			containers.set(id, container);
 
@@ -62,8 +74,8 @@ export function registerBottomSheetContainer(props: IBottomSheetContainerProps) 
 				containers.delete(id);
 			};
 		},
-		setProps(p: IBottomSheetContainerProps) {
-			containers.get(id)?.setProps(p);
+		setDefaultOptions(d: IBottomSheetDefaultOptions) {
+			containers.get(id)?.setDefaultOptions(d);
 		},
 		getSnapshot() {
 			return containers.get(id)?.getSnapshot();

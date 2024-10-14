@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
+import { RmoStack } from '../../core';
 import { IAlertDialogProps } from '../../core/AlertDialog/types';
 import { isFn } from '../../utils/propValidator';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
@@ -16,7 +17,6 @@ const AlertDialog = ({
 	deleteAlertDialog,
 	slotProps,
 	show,
-	sequenceNumber,
 	fullScreen,
 	maxWidth,
 	scroll,
@@ -39,8 +39,10 @@ const AlertDialog = ({
 	confirmOkButtonProps,
 	confirmCancelText,
 	confirmOkText,
-	actionButtons
+	actionButtons,
+	rmoStackId
 }: IAlertDialogProps) => {
+	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
 		[transitionPreset]
@@ -113,8 +115,8 @@ const AlertDialog = ({
 			slots={slots}
 			slotProps={slotProps}
 			sx={(theme) => ({
-				zIndex: theme.zIndex.modal + sequenceNumber,
-				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {}))
+				...(isFn(sx) ? (sx as Function)(theme) : (sx ?? {})),
+				zIndex: theme.zIndex.modal + sequenceNumber
 			})}
 		>
 			<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>

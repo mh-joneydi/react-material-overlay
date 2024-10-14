@@ -1,21 +1,20 @@
 import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
-import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { isFn } from '../../utils/propValidator';
-import { popRMOStackState } from '../RMO';
+import RmoStack from '../RmoStack';
 
-import { IAlertDialogContainerProps, IAlertDialogProps, INotValidatedAlertDialogProps } from './types';
+import { IAlertDialogDefaultOptions, IAlertDialogProps, INotValidatedAlertDialogProps } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
-export function createContainerObserver(id: Id, containerProps: IAlertDialogContainerProps) {
+export function createContainerObserver(id: Id, containerDefaultOptions: IAlertDialogDefaultOptions) {
 	let alertDialogCount = 0;
 	let activeAlertDialogs: Id[] = [];
 	let snapshot: IAlertDialogProps[] = [];
-	let props = containerProps;
+	let defaultOptions = containerDefaultOptions;
 
 	const alertDialogs = new Map<Id, IAlertDialogProps>();
 	const listeners = new Set<Notify>();
@@ -30,12 +29,11 @@ export function createContainerObserver(id: Id, containerProps: IAlertDialogCont
 		listeners.forEach((cb) => cb());
 	};
 
-	const shouldIgnore = ({ containerId, alertDialogId }: INotValidatedAlertDialogProps) => {
-		const containerMismatch = containerId ? containerId !== id : id !== Default.CONTAINER_ID;
-		const isDuplicate = alertDialogs.has(alertDialogId);
+	function shouldIgnorePop(alertDialogId: Id) {
+		const lastActiveAlertDialogId = activeAlertDialogs.at(-1);
 
-		return containerMismatch || isDuplicate;
-	};
+		return lastActiveAlertDialogId !== alertDialogId;
+	}
 
 	const popAlertDialog = () => {
 		activeAlertDialogs = activeAlertDialogs.slice(0, -1);
@@ -55,21 +53,25 @@ export function createContainerObserver(id: Id, containerProps: IAlertDialogCont
 		}
 	};
 
-	const buildAlertDialog = (options: INotValidatedAlertDialogProps): boolean => {
-		if (shouldIgnore(options)) {
-			return false;
+	const buildAlertDialog = (options: INotValidatedAlertDialogProps) => {
+		if (alertDialogs.has(options.alertDialogId)) {
+			throw new Error('alert dialog is duplicated!');
 		}
 
-		const { alertDialogId } = options;
+		const { alertDialogId, rmoStackId } = options;
 
 		const closeAlertDialog = async () => {
+			if (shouldIgnorePop(alertDialogId)) {
+				return;
+			}
+
 			popAlertDialog();
-			await popRMOStackState({ type: 'alertDialog', containerId: id, alertDialogId });
+			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
 		};
 
 		alertDialogCount++;
 
-		const { sx: defaultSx, classes: defaultClasses, ...containerProps } = props;
+		const { sx: defaultSx, classes: defaultClasses, ...containerProps } = defaultOptions;
 
 		const { classes, sx, ...alertDialogOptions } = options;
 
@@ -122,22 +124,21 @@ export function createContainerObserver(id: Id, containerProps: IAlertDialogCont
 			alertDialogProps.classes = classes;
 		}
 
-		pushAlertDialog(alertDialogProps);
-
-		return true;
+		return alertDialogProps;
 	};
 
 	return {
 		id,
-		props,
+		defaultOptions,
 		observe,
+		pushAlertDialog,
 		popAlertDialog,
 		get alertDialogCount() {
 			return alertDialogCount;
 		},
 		buildAlertDialog,
-		setProps(p: IAlertDialogContainerProps) {
-			props = p;
+		setDefaultOptions(d: IAlertDialogDefaultOptions) {
+			defaultOptions = d;
 		},
 		isAlertDialogActive: (id: Id) => activeAlertDialogs.some((v) => v === id),
 		getSnapshot: () => snapshot

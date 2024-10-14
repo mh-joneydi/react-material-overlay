@@ -2,20 +2,19 @@ import clsx from 'clsx';
 import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
-import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import { isFn } from '../../utils/propValidator';
-import { popRMOStackState } from '../RMO';
+import RmoStack from '../RmoStack';
 
-import { ILightboxContainerProps, ILightboxProps, INotValidatedLightboxProps } from './types';
+import { ILightboxDefaultOptions, ILightboxProps, INotValidatedLightboxProps } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
-export function createContainerObserver(id: Id, containerProps: ILightboxContainerProps) {
+export function createContainerObserver(id: Id, containerDefaultOptions: ILightboxDefaultOptions) {
 	let lightboxCount = 0;
 	let activeLightboxes: Id[] = [];
 	let snapshot: ILightboxProps[] = [];
-	let props = containerProps;
+	let defaultOptions = containerDefaultOptions;
 
 	const lightboxed = new Map<Id, ILightboxProps>();
 	const listeners = new Set<Notify>();
@@ -30,12 +29,10 @@ export function createContainerObserver(id: Id, containerProps: ILightboxContain
 		listeners.forEach((cb) => cb());
 	};
 
-	const shouldIgnore = ({ containerId, lightboxId }: INotValidatedLightboxProps) => {
-		const containerMismatch = containerId ? containerId !== id : id !== Default.CONTAINER_ID;
-		const isDuplicate = lightboxed.has(lightboxId);
-
-		return containerMismatch || isDuplicate;
-	};
+	function shouldIgnorePop(lightboxId: Id) {
+		const lastActiveId = activeLightboxes.at(-1);
+		return lastActiveId !== lightboxId;
+	}
 
 	const popLightbox = () => {
 		activeLightboxes = activeLightboxes.slice(0, -1);
@@ -55,21 +52,25 @@ export function createContainerObserver(id: Id, containerProps: ILightboxContain
 		}
 	};
 
-	const buildLightbox = (options: INotValidatedLightboxProps): boolean => {
-		if (shouldIgnore(options)) {
-			return false;
+	const buildLightbox = (options: INotValidatedLightboxProps) => {
+		if (lightboxed.has(options.lightboxId)) {
+			throw new Error('lightbox is already opened!');
 		}
 
-		const { lightboxId } = options;
+		const { lightboxId, rmoStackId } = options;
 
 		const closeLightbox = async () => {
+			if (shouldIgnorePop(lightboxId)) {
+				return;
+			}
+
 			popLightbox();
-			await popRMOStackState({ type: 'lightbox', containerId: id, lightboxId });
+			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
 		};
 
 		lightboxCount++;
 
-		const { className: defaultClassName, styles: defaultStyles, ...containerProps } = props;
+		const { className: defaultClassName, styles: defaultStyles, ...containerProps } = defaultOptions;
 
 		const { className, styles, ...lightboxOptions } = options;
 
@@ -123,22 +124,21 @@ export function createContainerObserver(id: Id, containerProps: ILightboxContain
 			lightboxProps.styles = styles || defaultStyles;
 		}
 
-		pushLightbox(lightboxProps);
-
-		return true;
+		return lightboxProps;
 	};
 
 	return {
 		id,
-		props,
+		defaultOptions,
 		observe,
+		pushLightbox,
 		popLightbox,
 		get alertDialogCount() {
 			return lightboxCount;
 		},
 		buildLightbox,
-		setProps(p: ILightboxContainerProps) {
-			props = p;
+		setDefaultOptions(d: ILightboxDefaultOptions) {
+			defaultOptions = d;
 		},
 		isLightboxActive: (id: Id) => activeLightboxes.some((v) => v === id),
 		getSnapshot: () => snapshot

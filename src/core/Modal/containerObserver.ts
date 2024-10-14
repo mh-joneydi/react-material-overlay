@@ -2,26 +2,20 @@ import React from 'react';
 import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
-import { Default } from '../../utils/constant';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
 import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
-import { popRMOStackState } from '../RMO';
+import RmoStack from '../RmoStack';
 
-import { IModal, IModalContainerProps, IModalProps, INotValidatedModalProps, ModalContent } from './types';
+import { IModal, IModalDefaultOptions, IModalProps, INotValidatedModalProps, ModalContent } from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
-interface IActiveModal {
-	content: React.ReactNode;
-	props: IModalProps;
-}
-
-export function createContainerObserver(id: Id, containerProps: IModalContainerProps) {
+export function createContainerObserver(containerId: Id, containerDefaultOptions: IModalDefaultOptions) {
 	let modalCount = 0;
 	let activeModals: Id[] = [];
 	let snapshot: IModal[] = [];
-	let props = containerProps;
+	let defaultOptions = containerDefaultOptions;
 
 	const modals = new Map<Id, IModal>();
 	const listeners = new Set<Notify>();
@@ -36,19 +30,17 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 		listeners.forEach((cb) => cb());
 	};
 
-	const shouldIgnoreModal = ({ containerId, modalId }: INotValidatedModalProps) => {
-		const containerMismatch = containerId ? containerId !== id : id !== Default.CONTAINER_ID;
-		const isDuplicate = modals.has(modalId);
-
-		return containerMismatch || isDuplicate;
-	};
+	function shouldIgnorePop(modalId: Id) {
+		const lastActiveId = activeModals.at(-1);
+		return lastActiveId !== modalId;
+	}
 
 	const popModal = () => {
 		activeModals = activeModals.slice(0, -1);
 		notify();
 	};
 
-	const pushModal = async (modal: IActiveModal) => {
+	const pushModal = (modal: IModal) => {
 		const { modalId, onOpen } = modal.props;
 
 		modals.set(modalId, modal);
@@ -61,16 +53,20 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 		}
 	};
 
-	const buildModal = (content: ModalContent, options: INotValidatedModalProps): boolean => {
-		if (shouldIgnoreModal(options)) {
-			return false;
+	const buildModal = (content: ModalContent, options: INotValidatedModalProps) => {
+		if (modals.has(options.modalId)) {
+			throw new Error('modal is duplicated!');
 		}
 
-		const { modalId } = options;
+		const { modalId, rmoStackId } = options;
 
 		const closeModal = async () => {
+			if (shouldIgnorePop(modalId)) {
+				return;
+			}
+
 			popModal();
-			await popRMOStackState({ type: 'modal', containerId: id, modalId });
+			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
 		};
 
 		modalCount++;
@@ -81,15 +77,15 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 			closeButton: defaultCloseButton,
 			header: defaultHeader,
 			closeButtonIcon: defaultCloseButtonIcon,
-			...containerProps
-		} = props;
+			..._defaultOptions
+		} = defaultOptions;
 
 		const { classes, closeButton, header, closeButtonIcon, sx, ...modalOptions } = options;
 
 		const modalProps = {
-			...enhancedMerge(containerProps, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
+			...enhancedMerge(_defaultOptions, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
 			modalId,
-			containerId: id,
+			containerId,
 			closeModal,
 			deleteModal() {
 				const modalToRemove = modals.get(modalId)!;
@@ -161,27 +157,26 @@ export function createContainerObserver(id: Id, containerProps: IModalContainerP
 			modalContent = content({ closeModal, modalProps });
 		}
 
-		const activeModal: IActiveModal = {
+		const activeModal: IModal = {
 			content: modalContent as React.ReactNode,
 			props: modalProps
 		};
 
-		pushModal(activeModal);
-
-		return true;
+		return activeModal;
 	};
 
 	return {
-		id,
-		props,
+		id: containerId,
+		defaultOptions,
 		observe,
 		popModal,
+		pushModal,
 		get modalCount() {
 			return modalCount;
 		},
 		buildModal,
-		setProps(p: IModalContainerProps) {
-			props = p;
+		setDefaultOptions(d: IModalDefaultOptions) {
+			defaultOptions = d;
 		},
 		isModalActive: (id: Id) => activeModals.some((v) => v === id),
 		getSnapshot: () => snapshot

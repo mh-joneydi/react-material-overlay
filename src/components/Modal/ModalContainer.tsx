@@ -1,15 +1,10 @@
 import { IModalContainerProps } from '../../core/Modal/types';
-import { useModalContainer } from '../../hooks/Modal/useModalContainer';
+import { useModalContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import Modal from './Modal';
 
-interface ModalContainerProps {
-	reactSuspenseFallback?: React.ReactNode;
-	defaultOptions?: IModalContainerProps;
-}
-
-export const defaultProps: ModalContainerProps = {
+export const defaultProps: IModalContainerProps = {
 	defaultOptions: {
 		scroll: 'paper',
 		closeOnBackdropClick: true,
@@ -21,16 +16,15 @@ export const defaultProps: ModalContainerProps = {
 	}
 };
 
-export default function ModalContainer(props: ModalContainerProps) {
-	const { defaultOptions, reactSuspenseFallback } = enhancedMerge(defaultProps, props);
+export default function ModalContainer(props: Partial<IModalContainerProps>) {
+	const containerProps = enhancedMerge(defaultProps, props);
 
-	const { isModalActive, modalList } = useModalContainer(defaultOptions!);
+	const { isModalActive, modalList } = useModalContainer(containerProps);
 
 	return modalList.map(({ content, props: modalProps }) => {
 		return (
 			<Modal
 				{...modalProps}
-				reactSuspenseFallback={reactSuspenseFallback}
 				show={isModalActive(modalProps.modalId, modalProps.containerId)}
 				key={`modal-${modalProps.containerId}-${modalProps.modalId}`}
 			>

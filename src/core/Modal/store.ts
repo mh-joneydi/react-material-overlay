@@ -3,7 +3,7 @@ import { Default } from '../../utils/constant';
 import { canBeRendered } from '../../utils/propValidator';
 
 import { ContainerObserver, createContainerObserver } from './containerObserver';
-import { IModalContainerProps, INotValidatedModalProps, ModalContent } from './types';
+import { IModal, IModalContainerProps, IModalDefaultOptions, INotValidatedModalProps, ModalContent } from './types';
 
 const containers = new Map<Id, ContainerObserver>();
 
@@ -24,34 +24,40 @@ export function isModalActive(id: Id, containerId?: Id) {
 	return isActive;
 }
 
-export function pushModal(content: ModalContent, options: INotValidatedModalProps): boolean {
-	if (!canBeRendered(content) || !hasContainers()) {
-		return false;
+export function buildModal(content: ModalContent, options: INotValidatedModalProps) {
+	if (!canBeRendered(content)) {
+		throw new Error('modal contnet can not be rendered!');
 	}
 
-	let pushed = false;
+	if (!hasContainers()) {
+		throw new Error('there is no container for push new modal!');
+	}
 
-	containers.forEach((c) => {
-		const _pushed = c.buildModal(content, options);
+	const id = options.containerId || Default.CONTAINER_ID;
 
-		if (_pushed) {
-			pushed = true;
-		}
-	});
+	const container = containers.get(id);
 
-	return pushed;
+	if (!container) {
+		throw new Error(`there is no container with id: ${id} for push new modal!`);
+	}
+
+	return container.buildModal(content, options);
 }
 
-export function popModal(containerId: Id) {
+export function pushModal(modal: IModal) {
+	containers.get(modal.props.containerId)?.pushModal(modal);
+}
+
+export function popModal(containerId: Id = Default.CONTAINER_ID) {
 	containers.get(containerId)?.popModal();
 }
 
-export function registerModalContainer(props: IModalContainerProps) {
-	const id = props.containerId || Default.CONTAINER_ID;
+export function registerModalContainer({ defaultOptions, containerId }: IModalContainerProps) {
+	const id = containerId || Default.CONTAINER_ID;
 
 	return {
 		subscribe(notify: Notify) {
-			const container = createContainerObserver(id, props);
+			const container = createContainerObserver(id, defaultOptions);
 
 			containers.set(id, container);
 
@@ -62,8 +68,8 @@ export function registerModalContainer(props: IModalContainerProps) {
 				containers.delete(id);
 			};
 		},
-		setProps(p: IModalContainerProps) {
-			containers.get(id)?.setProps(p);
+		setDefaultOptions(d: IModalDefaultOptions) {
+			containers.get(id)?.setDefaultOptions(d);
 		},
 		getSnapshot() {
 			return containers.get(id)?.getSnapshot();

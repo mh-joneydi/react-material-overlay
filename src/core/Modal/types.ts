@@ -10,8 +10,8 @@ import {
 	ZoomProps
 } from '@mui/material';
 
-import { IModalCloseButtonProps } from '../../components/Modal/ModalCloseButton';
 import { transitionPreset } from '../../components/getPresetTransitionComponent';
+import { IModalCloseButtonProps } from '../../components/Modal/ModalCloseButton';
 import { ModalHeaderProps } from '../../components/Modal/ModalHeader';
 import { Id } from '../../types';
 
@@ -31,10 +31,6 @@ export type IFrequentlyUsedDialogProps = Pick<
 >;
 
 export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
-	/**
-	 * Set id to handle multiple container
-	 */
-	containerId?: Id;
 	/**
 	 * Pass a custom close button.
 	 * To remove the close button pass `false`
@@ -118,33 +114,48 @@ export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
 	 *  @see {@link https://mui.com/material-ui/api/card-content/#props} for more details.
 	 */
 	contentWrapperProps?: Omit<CardContentProps, 'children'>;
+	/**
+	 * Set custom React Suspense Fallback UI instead default for lazy contents
+	 */
+	reactSuspenseFallback?: React.ReactNode;
 }
 
-export interface IModalContainerProps extends IModalCommonOptions {
+export interface IModalDefaultOptions extends IModalCommonOptions {
 	classes?: DialogProps['classes'];
+}
+
+export interface IModalContainerProps {
+	/**
+	 * Set id to handle multiple container
+	 */
+	containerId?: Id;
+	/**
+	 * set default options for modals
+	 */
+	defaultOptions: IModalDefaultOptions;
 }
 
 export interface IModalOptions extends IModalCommonOptions {
 	/**
+	 * container id to handle multiple container
+	 */
+	containerId?: Id;
+	/**
 	 * Set a custom `modalId` for prevent duplicating
 	 */
 	modalId?: Id;
-
 	/**
 	 * modal title
 	 */
 	title?: React.ReactNode;
-
 	/**
 	 * modal sub header title
 	 */
 	subheader?: React.ReactNode;
-
 	/**
 	 * Called when modal is mounted.
 	 */
 	onOpen?: () => void;
-
 	/**
 	 * Called when modal is unmounted.
 	 */
@@ -172,18 +183,17 @@ export interface IModalOptions extends IModalCommonOptions {
 export interface IModalProps extends IModalOptions {
 	modalId: Id;
 	containerId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 	show: boolean;
 	children: React.ReactNode;
 	closeModal: () => Promise<void>;
 	deleteModal: () => void;
-	reactSuspenseFallback?: React.ReactNode;
 	classes?: DialogProps['classes'];
 }
 
 export interface INotValidatedModalProps extends Partial<IModalProps> {
 	modalId: Id;
-	sequenceNumber: number;
+	rmoStackId: Id;
 }
 
 export interface IModalContentProps {
