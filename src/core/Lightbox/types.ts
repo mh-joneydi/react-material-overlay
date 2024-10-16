@@ -145,7 +145,7 @@ export interface ILightboxContainerProps {
 	 */
 	containerId?: Id;
 	/**
-	 * set default options for modals
+	 * set default options for lightbox
 	 */
 	defaultOptions: ILightboxDefaultOptions;
 }

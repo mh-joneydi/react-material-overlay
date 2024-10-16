@@ -72,7 +72,7 @@ export interface IBottomSheetContainerProps {
 	 */
 	containerId?: Id;
 	/**
-	 * set default options for modals
+	 * set default options for bottomSheets
 	 */
 	defaultOptions: IBottomSheetDefaultOptions;
 }

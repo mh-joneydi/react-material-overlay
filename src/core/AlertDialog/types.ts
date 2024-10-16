@@ -136,7 +136,7 @@ export interface IAlertDialogContainerProps {
 	 */
 	containerId?: Id;
 	/**
-	 * set default options for modals
+	 * set default options for alertDialogs
 	 */
 	defaultOptions: IAlertDialogDefaultOptions;
 }
