@@ -1,5 +1,4 @@
-import createCache from '@emotion/cache';
-import { CacheProvider, css, Global } from '@emotion/react';
+import { css, Global } from '@emotion/react';
 import { alpha, GlobalStyles } from '@mui/material';
 import yarlStyles from 'yet-another-react-lightbox/styles.css';
 
@@ -24,15 +23,13 @@ export const defaultProps: ILightboxContainerProps = {
 	}
 };
 
-const yarlStylesCache = createCache({ key: 'yarl', prepend: true });
-
 export default function LightboxContainer(props: Partial<ILightboxContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);
 
 	const { isLightboxActive, lightboxList } = useLightboxContainer(containerProps);
 
 	return (
-		<CacheProvider value={yarlStylesCache}>
+		<>
 			<Global styles={css(yarlStyles as string)} />
 			<GlobalStyles
 				styles={(theme) => ({
@@ -64,6 +61,6 @@ export default function LightboxContainer(props: Partial<ILightboxContainerProps
 					/>
 				);
 			})}
-		</CacheProvider>
+		</>
 	);
 }

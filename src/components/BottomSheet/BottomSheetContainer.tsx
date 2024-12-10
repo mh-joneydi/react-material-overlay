@@ -1,6 +1,5 @@
 import rsbsStyles from 'react-spring-bottom-sheet/dist/style.css';
-import createCache from '@emotion/cache';
-import { CacheProvider, css, Global } from '@emotion/react';
+import { css, Global } from '@emotion/react';
 import { GlobalStyles } from '@mui/material';
 
 import { IBottomSheetContainerProps } from '../../core/BottomSheet/types';
@@ -15,15 +14,13 @@ export const defaultProps: IBottomSheetContainerProps = {
 	}
 };
 
-const rsbsStylesCache = createCache({ key: 'rsbs', prepend: true });
-
 export default function ModalContainer(props: Partial<IBottomSheetContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);
 
 	const { isBottomSheetActive, bottomSheetList } = useBottomSheetContainer(containerProps);
 
 	return (
-		<CacheProvider value={rsbsStylesCache}>
+		<>
 			<Global styles={css(rsbsStyles as string)} />
 			<GlobalStyles
 				styles={(theme) => ({
@@ -44,6 +41,6 @@ export default function ModalContainer(props: Partial<IBottomSheetContainerProps
 					</BottomSheet>
 				);
 			})}
-		</CacheProvider>
+		</>
 	);
 }

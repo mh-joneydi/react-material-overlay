@@ -1,11 +1,11 @@
 {
   "name": "react-material-overlay",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A React package for creating customizable overlays like modals, alert dialogs, lightboxes, and bottom sheets in the Material UI ecosystem, featuring easy stack management and browser history integration.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "jsnext:main": "dist/index.esm.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "source": "src/index.ts",
   "scripts": {
     "clean": "rimraf dist",

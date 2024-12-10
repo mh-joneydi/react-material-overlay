@@ -11,7 +11,7 @@ export const isFn = (v: any): v is Function => typeof v === 'function';
 export const isId = (v: unknown): v is Id => isStr(v) || isNum(v);
 
 export function isReactRef(value: unknown) {
-	return !!value && typeof value === 'object' && 'current' in value && value.current !== undefined;
+	return !!value && typeof value === 'object' && 'current' in value;
 }
 
 export const canBeRendered = <T>(content: T): boolean =>

@@ -11,16 +11,16 @@ export default {
 		{
 			file: 'dist/index.cjs.js',
 			format: 'cjs',
-			sourcemap: false,
+			sourcemap: true,
 			exports: 'named',
-			name: 'ReactOverlayComponents'
+			name: 'reactMaterialOverlay'
 		},
 		{
 			file: 'dist/index.esm.js',
 			format: 'esm',
-			sourcemap: false,
+			sourcemap: true,
 			exports: 'named',
-			name: 'ReactOverlayComponents'
+			name: 'reactMaterialOverlay'
 		}
 	],
 	plugins: [
@@ -40,5 +40,5 @@ export default {
 			}
 		})
 	],
-	external: ['react', 'react-dom']
+	external: ['react', 'react-dom', '@mui/material', '@emotion/styled', '@emotion/react']
 };
