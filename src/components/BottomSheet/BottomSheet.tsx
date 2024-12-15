@@ -1,10 +1,14 @@
 import React from 'react';
 import { BottomSheet as RSBottomSheet } from 'react-spring-bottom-sheet';
-import { GlobalStyles } from '@mui/material';
+import { Box, GlobalStyles } from '@mui/material';
 
-import { BottomSheetRef, IBottomSheetProps } from '../../core/BottomSheet/types';
+import { BottomSheetHeaderProps, BottomSheetRef, IBottomSheetProps } from '../../core/BottomSheet/types';
 import { useRmoStackItemIndex } from '../../hooks';
+import { isFn } from '../../utils';
+import CloseButton, { ICloseButtonProps } from '../CloseButton';
 import SuspenseFallback from '../SuspenseFallback';
+
+import BottomSheetDefaultHeader from './BottomSheetDefaultHeader';
 
 export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function BottomSheet(
 	{
@@ -32,12 +36,74 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		skipInitialTransition,
 		snapPoints,
 		BottomSheetProps,
-		sx
+		sx,
+		closeButtonProps,
+		headerProps,
+		closeButton,
+		closeButtonIcon,
+		defaultHeader,
+		subheader,
+		title,
+		contentWrapperProps
 	},
 	ref
 ) {
 	const sequenceNumber = useRmoStackItemIndex(bottomSheetId);
 	const rsbsId = `rsbs-${containerId}-${bottomSheetId}`;
+
+	const _closeButtonProps: ICloseButtonProps = {
+		closeButtonProps,
+		closeHandler: closeBottomSheet,
+		icon: closeButtonIcon
+	};
+
+	let Close: React.ReactNode = null;
+
+	if (closeButton === false) {
+		// hide
+	} else if (isFn(closeButton)) {
+		Close = closeButton(_closeButtonProps);
+	} else if (React.isValidElement(closeButton)) {
+		Close = React.cloneElement(closeButton, closeButtonProps);
+	} else {
+		Close = CloseButton(_closeButtonProps);
+	}
+
+	const _headerProps: BottomSheetHeaderProps = {
+		closeButton: Close,
+		closeBottomSheet,
+		bottomSheetProps: {
+			bottomSheetId,
+			containerId,
+			blocking,
+			defaultSnap,
+			expandOnContentDrag,
+			initialFocusRef,
+			maxHeight,
+			onSpringCancel,
+			onSpringEnd,
+			onSpringStart,
+			reserveScrollBarGap,
+			scrollLocking,
+			skipInitialTransition,
+			snapPoints,
+			headerProps,
+			subheader,
+			title
+		}
+	};
+
+	let Header: React.ReactNode;
+
+	if (header === false) {
+		Header = false;
+	} else if (isFn(header)) {
+		Header = header(_headerProps);
+	} else if (React.isValidElement(header)) {
+		Header = React.cloneElement(header, _headerProps);
+	} else if (defaultHeader !== false) {
+		Header = BottomSheetDefaultHeader(_headerProps);
+	}
 
 	return (
 		<>
@@ -60,7 +126,7 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 				defaultSnap={defaultSnap}
 				expandOnContentDrag={expandOnContentDrag}
 				footer={footer}
-				header={header}
+				header={Header}
 				initialFocusRef={initialFocusRef}
 				maxHeight={maxHeight}
 				onSpringCancel={onSpringCancel}
@@ -81,7 +147,19 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 					onSpringEnd?.(event);
 				}}
 			>
-				<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{children}</React.Suspense>
+				<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>
+					<Box
+						padding={2}
+						{...(contentWrapperProps ?? {})}
+						sx={(theme) => ({
+							...(isFn(contentWrapperProps?.sx)
+								? (contentWrapperProps.sx as Function)(theme)
+								: (contentWrapperProps?.sx ?? {}))
+						})}
+					>
+						{children}
+					</Box>
+				</React.Suspense>
 			</RSBottomSheet>
 		</>
 	);

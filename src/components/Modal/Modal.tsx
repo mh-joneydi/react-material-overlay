@@ -1,13 +1,13 @@
 import React from 'react';
-import { CardContent, Dialog } from '@mui/material';
+import { Box, Dialog } from '@mui/material';
 
 import { IModalProps } from '../../core/Modal/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
+import CloseButton, { ICloseButtonProps } from '../CloseButton';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
 
-import ModalCloseButton, { IModalCloseButtonProps } from './ModalCloseButton';
 import ModalHeader, { ModalHeaderProps } from './ModalHeader';
 
 const Modal = ({
@@ -59,7 +59,7 @@ const Modal = ({
 
 	const content = <React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{children}</React.Suspense>;
 
-	const _closeButtonProps: IModalCloseButtonProps = {
+	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeModal,
 		icon: isFn(closeButtonIcon) ? closeButtonIcon({ transitionPreset, transitionProps, fullScreen }) : closeButtonIcon
@@ -74,7 +74,7 @@ const Modal = ({
 	} else if (React.isValidElement(closeButton)) {
 		Close = React.cloneElement(closeButton, closeButtonProps);
 	} else {
-		Close = ModalCloseButton(_closeButtonProps);
+		Close = CloseButton(_closeButtonProps);
 	}
 
 	const _headerProps: ModalHeaderProps = {
@@ -130,7 +130,9 @@ const Modal = ({
 			) : (
 				<React.Fragment>
 					{Header}
-					<CardContent
+					<Box
+						padding={2}
+						paddingTop={0}
 						{...(contentWrapperProps ?? {})}
 						sx={(theme) => ({
 							overflow: scroll === 'paper' ? 'auto' : undefined,
@@ -140,7 +142,7 @@ const Modal = ({
 						})}
 					>
 						{content}
-					</CardContent>
+					</Box>
 				</React.Fragment>
 			)}
 		</Dialog>

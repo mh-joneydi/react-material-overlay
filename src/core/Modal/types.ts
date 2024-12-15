@@ -1,5 +1,5 @@
 import {
-	CardContentProps,
+	BoxProps,
 	CardHeaderProps,
 	CollapseProps,
 	DialogProps,
@@ -10,8 +10,8 @@ import {
 	ZoomProps
 } from '@mui/material';
 
+import { ICloseButtonProps } from '../../components/CloseButton';
 import { transitionPreset } from '../../components/getPresetTransitionComponent';
-import { IModalCloseButtonProps } from '../../components/Modal/ModalCloseButton';
 import { ModalHeaderProps } from '../../components/Modal/ModalHeader';
 import { Id } from '../../types';
 
@@ -37,10 +37,7 @@ export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
 	 *
 	 * By default, the closeButton element is [`IconButton`]('https://mui.com/material-ui/api/icon-button/')
 	 */
-	closeButton?:
-		| boolean
-		| ((props: IModalCloseButtonProps) => React.ReactNode)
-		| React.ReactElement<IModalCloseButtonProps>;
+	closeButton?: boolean | ((props: ICloseButtonProps) => React.ReactNode) | React.ReactElement<ICloseButtonProps>;
 	/**
 	 * Props applied to the closeButton element.
 	 *
@@ -111,9 +108,9 @@ export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
 	/**
 	 * Props for the wrapper component of content
 	 *
-	 *  @see {@link https://mui.com/material-ui/api/card-content/#props} for more details.
+	 *  @see {@link https://mui.com/material-ui/api/box/#props} for more details.
 	 */
-	contentWrapperProps?: Omit<CardContentProps, 'children'>;
+	contentWrapperProps?: Omit<BoxProps, 'children'>;
 	/**
 	 * Set custom React Suspense Fallback UI instead default for lazy contents
 	 */

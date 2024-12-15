@@ -83,11 +83,13 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			sx: defaultSx,
 			className: defaultClassName,
 			footer: defaultFooter,
+			header: defaultHeader,
 			sibling: defaultSibling,
+			closeButton: defaultCloseButton,
 			...containerProps
 		} = defaultOptions;
 
-		const { sx, className, footer, sibling, ...bottomSheetOptions } = options;
+		const { sx, className, footer, sibling, header, closeButton, ...bottomSheetOptions } = options;
 
 		const bottomSheetProps = {
 			...enhancedMerge(
@@ -138,7 +140,23 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			bottomSheetProps.className = className;
 		}
 
-		const renderProps: IBottomSheetCustomRenderProps = { closeBottomSheet, bottomSheetProps };
+		const commonRenderProps: IBottomSheetCustomRenderProps = { closeBottomSheet, bottomSheetProps };
+
+		bottomSheetProps.closeButton = defaultCloseButton;
+
+		if (closeButton === false || canBeRendered(closeButton)) {
+			bottomSheetProps.closeButton = closeButton;
+		} else if (closeButton === true) {
+			bottomSheetProps.closeButton = canBeRendered(defaultCloseButton) ? defaultCloseButton : true;
+		}
+
+		bottomSheetProps.header = defaultHeader;
+
+		if (header === false || canBeRendered(header)) {
+			bottomSheetProps.header = header;
+		} else if (header === true) {
+			bottomSheetProps.header = canBeRendered(defaultHeader) ? defaultHeader : true;
+		}
 
 		let _footer = defaultFooter;
 
@@ -148,9 +166,9 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 
 		if (_footer) {
 			if (isFn(_footer)) {
-				bottomSheetProps.footer = _footer(renderProps);
+				bottomSheetProps.footer = _footer(commonRenderProps);
 			} else if (React.isValidElement(_footer)) {
-				bottomSheetProps.footer = React.cloneElement(_footer, renderProps);
+				bottomSheetProps.footer = React.cloneElement(_footer, commonRenderProps);
 			}
 		}
 
@@ -162,18 +180,21 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 
 		if (_sibling) {
 			if (isFn(_sibling)) {
-				bottomSheetProps.sibling = _sibling(renderProps);
+				bottomSheetProps.sibling = _sibling(commonRenderProps);
 			} else if (React.isValidElement(_sibling)) {
-				bottomSheetProps.sibling = React.cloneElement(_sibling, renderProps);
+				bottomSheetProps.sibling = React.cloneElement(_sibling, commonRenderProps);
 			}
 		}
 
 		let bottomSheetContent = content;
 
 		if (React.isValidElement(content) && !isStr(content.type)) {
-			bottomSheetContent = React.cloneElement(content as React.ReactElement<BottomSheetContentProps>, renderProps);
+			bottomSheetContent = React.cloneElement(
+				content as React.ReactElement<BottomSheetContentProps>,
+				commonRenderProps
+			);
 		} else if (isFn(content)) {
-			bottomSheetContent = content(renderProps);
+			bottomSheetContent = content(commonRenderProps);
 		}
 
 		const activeBottomSheet: IBottomSheet = {
