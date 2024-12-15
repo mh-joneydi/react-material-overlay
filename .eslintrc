@@ -31,7 +31,7 @@
         { "blankLine": "always", "prev": "if", "next": "*" },
         { "blankLine": "always", "prev": "*", "next": "function" }
     ],
-    "no-console": ["error", { "allow": ["error"] }],
+    "no-console": ["error", { "allow": ["error", "warn"] }],
     "curly": "error",
     "no-extra-boolean-cast": "error",
     "@typescript-eslint/no-non-null-assertion": "off",

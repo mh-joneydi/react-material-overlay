@@ -117,7 +117,6 @@ export interface IBottomSheetOptions extends IBottomSheetCommonOptions {
 export interface IBottomSheetProps extends IBottomSheetOptions {
 	bottomSheetId: Id;
 	containerId: Id;
-	rmoStackId: Id;
 	show: boolean;
 	children: React.ReactNode;
 	closeBottomSheet: () => Promise<void>;
@@ -130,7 +129,6 @@ export interface IBottomSheetProps extends IBottomSheetOptions {
 
 export interface INotValidatedBottomSheetProps extends Partial<IBottomSheetOptions> {
 	bottomSheetId: Id;
-	rmoStackId: Id;
 }
 
 export type BottomSheetContent = React.ReactNode | ((props: BottomSheetContentProps) => React.ReactNode);

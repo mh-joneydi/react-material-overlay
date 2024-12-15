@@ -1,8 +1,8 @@
 import React from 'react';
 import { CardContent, Dialog } from '@mui/material';
 
-import { RmoStack } from '../../core';
 import { IModalProps } from '../../core/Modal/types';
+import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
@@ -41,9 +41,9 @@ const Modal = ({
 	header,
 	subheader,
 	slotProps,
-	rmoStackId
+	modalId
 }: IModalProps) => {
-	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
+	const sequenceNumber = useRmoStackItemIndex(modalId);
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
 		[transitionPreset]

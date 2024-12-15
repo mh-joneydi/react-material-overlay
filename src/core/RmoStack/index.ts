@@ -9,7 +9,7 @@ const listeners = new Map<Id, () => void>();
 const stack: Id[] = [];
 const mutex = new Mutex();
 
-interface PushOptions {
+export interface PushOptions {
 	/**
 	 * Optional identifier for the item being pushed.
 	 */
@@ -20,7 +20,7 @@ interface PushOptions {
 	onPopState: () => void;
 }
 
-interface SinglePopOptions {
+export interface SinglePopOptions {
 	/**
 	 * If true, prevents triggering the event when the item is popped.
 	 */
@@ -39,6 +39,10 @@ interface SinglePopOptions {
  */
 async function popMultiple(count: number, preventEventTriggering: boolean = false): Promise<void> {
 	const items = stack.splice(-Math.abs(count));
+
+	if (items.length === 0) {
+		return;
+	}
 
 	items.forEach((id) => triggerListener(id, preventEventTriggering));
 	await popHistoryState(items.length);
@@ -159,6 +163,11 @@ const RmoStack = {
 	async push(options: PushOptions): Promise<{ id: Id; index: number }> {
 		return mutex.runExclusive(() => {
 			const id = options.id && isId(options.id) ? options.id : genRmoStackId();
+
+			if (stack.some((value) => value === id)) {
+				throw new Error(`The push request is duplicate with id: ${id}. \n Each push must be made with a unique id.`);
+			}
+
 			stack.push(id);
 			listeners.set(id, options.onPopState);
 
@@ -170,6 +179,10 @@ const RmoStack = {
 	pop: ((params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<void> => {
 		return mutex.runExclusive(async () => {
 			if (isNum(params)) {
+				if (process.env.NODE_ENV !== 'production' && params < 2) {
+					console.warn('for multiple pops, count must be at least 2, otherwise use pop without count parameter.');
+				}
+
 				// Pop multiple items
 				await popMultiple(params, preventEventTriggering);
 			} else {
@@ -190,7 +203,7 @@ const RmoStack = {
 		 * @param {boolean} [preventEventTriggering] - If true, prevents triggering the associated events.
 		 * @returns {Promise<void>} - A promise that resolves when the pop operation is complete.
 		 */
-		(count: number, preventEventTriggering?: boolean): Promise<void>;
+		(count?: number, preventEventTriggering?: boolean): Promise<void>;
 	},
 
 	/**
@@ -201,6 +214,11 @@ const RmoStack = {
 	async flush(preventEventTriggering: boolean = false): Promise<void> {
 		return mutex.runExclusive(async () => {
 			const items = stack.splice(0);
+
+			if (items.length === 0) {
+				return;
+			}
+
 			items.forEach((id) => triggerListener(id, preventEventTriggering));
 			await popHistoryState(items.length);
 		});

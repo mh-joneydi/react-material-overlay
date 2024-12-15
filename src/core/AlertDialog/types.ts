@@ -197,7 +197,6 @@ export interface IAlertDialogOptions extends IAlertDialogCommonOptions {
 export interface IAlertDialogProps extends IAlertDialogOptions {
 	alertDialogId: Id;
 	containerId: Id;
-	rmoStackId: Id;
 	show: boolean;
 	closeAlertDialog: () => Promise<void>;
 	deleteAlertDialog: () => void;
@@ -206,5 +205,4 @@ export interface IAlertDialogProps extends IAlertDialogOptions {
 
 export interface INotValidatedAlertDialogProps extends Partial<IAlertDialogProps> {
 	alertDialogId: Id;
-	rmoStackId: Id;
 }

@@ -16,8 +16,8 @@ import yarlThumbnailsPluginStyles from 'yet-another-react-lightbox/plugins/thumb
 import Video from 'yet-another-react-lightbox/plugins/video';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 
-import { RmoStack } from '../../core';
 import { ILightboxProps } from '../../core/Lightbox/types';
+import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 
 const Lightbox = ({
@@ -53,9 +53,9 @@ const Lightbox = ({
 	on,
 	slides,
 	extraPlugins,
-	rmoStackId
+	lightboxId
 }: ILightboxProps) => {
-	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
+	const sequenceNumber = useRmoStackItemIndex(lightboxId);
 
 	const theme = useTheme();
 	const plugins = React.useMemo(

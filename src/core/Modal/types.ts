@@ -183,7 +183,6 @@ export interface IModalOptions extends IModalCommonOptions {
 export interface IModalProps extends IModalOptions {
 	modalId: Id;
 	containerId: Id;
-	rmoStackId: Id;
 	show: boolean;
 	children: React.ReactNode;
 	closeModal: () => Promise<void>;
@@ -193,7 +192,6 @@ export interface IModalProps extends IModalOptions {
 
 export interface INotValidatedModalProps extends Partial<IModalProps> {
 	modalId: Id;
-	rmoStackId: Id;
 }
 
 export interface IModalContentProps {

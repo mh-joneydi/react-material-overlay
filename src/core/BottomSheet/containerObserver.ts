@@ -66,7 +66,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			throw new Error('bottom sheet is duplicated!');
 		}
 
-		const { bottomSheetId, rmoStackId } = options;
+		const { bottomSheetId } = options;
 
 		const closeBottomSheet = async () => {
 			if (shouldIgnorePop(bottomSheetId)) {
@@ -74,7 +74,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			}
 
 			popBottomSheet();
-			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
+			await RmoStack.pop({ id: bottomSheetId, preventEventTriggering: true });
 		};
 
 		bottomSheetCount++;

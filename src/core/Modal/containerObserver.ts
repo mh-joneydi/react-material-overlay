@@ -58,7 +58,7 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			throw new Error('modal is duplicated!');
 		}
 
-		const { modalId, rmoStackId } = options;
+		const { modalId } = options;
 
 		const closeModal = async () => {
 			if (shouldIgnorePop(modalId)) {
@@ -66,7 +66,7 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			}
 
 			popModal();
-			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
+			await RmoStack.pop({ id: modalId, preventEventTriggering: true });
 		};
 
 		modalCount++;

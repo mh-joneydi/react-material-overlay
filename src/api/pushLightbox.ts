@@ -1,8 +1,15 @@
 import { buildLightbox, popLightbox, pushLightbox } from '../core/Lightbox/store';
 import { ILightboxOptions, INotValidatedLightboxProps } from '../core/Lightbox/types';
 import RmoStack from '../core/RmoStack';
-import { genRmoStackId } from '../core/RmoStack/genRmoStackId';
 import { Id } from '../types';
+import { isId } from '../utils';
+
+/**
+ * Generate a lightboxId or use the one provided
+ */
+function getLightboxId(options?: ILightboxOptions) {
+	return options && isId(options.lightboxId) ? options.lightboxId : 'lightbox-overlay';
+}
 
 /**
  * Merge provided options with the defaults settings and generate the lightboxId
@@ -10,8 +17,7 @@ import { Id } from '../types';
 function mergeOptions(options?: ILightboxOptions) {
 	return {
 		...options,
-		lightboxId: 'singleton',
-		rmoStackId: genRmoStackId()
+		lightboxId: getLightboxId(options)
 	} as INotValidatedLightboxProps;
 }
 
@@ -26,13 +32,16 @@ export default async function (options?: ILightboxOptions): Promise<Id | null> {
 		const mergedOptions = mergeOptions(options);
 		const lightbox = buildLightbox(mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.rmoStackId, onPopState: () => popLightbox(options?.containerId) });
+		await RmoStack.push({ id: mergedOptions.lightboxId, onPopState: () => popLightbox(options?.containerId) });
 
 		pushLightbox(lightbox);
 
 		return mergedOptions.lightboxId;
 	} catch (error) {
-		console.error(error);
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error);
+		}
+
 		return null;
 	}
 }

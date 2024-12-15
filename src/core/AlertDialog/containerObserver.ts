@@ -58,7 +58,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 			throw new Error('alert dialog is duplicated!');
 		}
 
-		const { alertDialogId, rmoStackId } = options;
+		const { alertDialogId } = options;
 
 		const closeAlertDialog = async () => {
 			if (shouldIgnorePop(alertDialogId)) {
@@ -66,7 +66,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 			}
 
 			popAlertDialog();
-			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
+			await RmoStack.pop({ id: alertDialogId, preventEventTriggering: true });
 		};
 
 		alertDialogCount++;

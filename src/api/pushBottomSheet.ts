@@ -2,7 +2,6 @@ import { genBottomSheetId } from '../core/BottomSheet/genBottomSheetId';
 import { buildBottomSheet, popBottomSheet, pushBottomSheet } from '../core/BottomSheet/store';
 import { BottomSheetContent, IBottomSheetOptions, INotValidatedBottomSheetProps } from '../core/BottomSheet/types';
 import RmoStack from '../core/RmoStack';
-import { genRmoStackId } from '../core/RmoStack/genRmoStackId';
 import { Id } from '../types';
 import { isId } from '../utils/propValidator';
 
@@ -19,8 +18,7 @@ function getBottomSheetId(options?: IBottomSheetOptions) {
 function mergeOptions(options?: IBottomSheetOptions) {
 	return {
 		...options,
-		bottomSheetId: getBottomSheetId(options),
-		rmoStackId: genRmoStackId()
+		bottomSheetId: getBottomSheetId(options)
 	} as INotValidatedBottomSheetProps;
 }
 
@@ -35,13 +33,16 @@ export default async function (content: BottomSheetContent, options?: IBottomShe
 		const mergedOptions = mergeOptions(options);
 		const bottomSheet = buildBottomSheet(content, mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.rmoStackId, onPopState: () => popBottomSheet(options?.containerId) });
+		await RmoStack.push({ id: mergedOptions.bottomSheetId, onPopState: () => popBottomSheet(options?.containerId) });
 
 		pushBottomSheet(bottomSheet);
 
 		return mergedOptions.bottomSheetId;
 	} catch (error) {
-		console.error(error);
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error);
+		}
+
 		return null;
 	}
 }

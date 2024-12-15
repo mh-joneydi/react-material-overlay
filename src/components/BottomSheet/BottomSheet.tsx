@@ -2,8 +2,8 @@ import React from 'react';
 import { BottomSheet as RSBottomSheet } from 'react-spring-bottom-sheet';
 import { GlobalStyles } from '@mui/material';
 
-import { RmoStack } from '../../core';
 import { BottomSheetRef, IBottomSheetProps } from '../../core/BottomSheet/types';
+import { useRmoStackItemIndex } from '../../hooks';
 import SuspenseFallback from '../SuspenseFallback';
 
 export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function BottomSheet(
@@ -32,12 +32,11 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		skipInitialTransition,
 		snapPoints,
 		BottomSheetProps,
-		rmoStackId,
 		sx
 	},
 	ref
 ) {
-	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
+	const sequenceNumber = useRmoStackItemIndex(bottomSheetId);
 	const rsbsId = `rsbs-${containerId}-${bottomSheetId}`;
 
 	return (

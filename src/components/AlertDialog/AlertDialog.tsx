@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-import { RmoStack } from '../../core';
 import { IAlertDialogProps } from '../../core/AlertDialog/types';
+import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
@@ -40,9 +40,9 @@ const AlertDialog = ({
 	confirmCancelText,
 	confirmOkText,
 	actionButtons,
-	rmoStackId
+	alertDialogId
 }: IAlertDialogProps) => {
-	const sequenceNumber = React.useRef(RmoStack.findIndexById(rmoStackId)).current;
+	const sequenceNumber = useRmoStackItemIndex(alertDialogId);
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
 		[transitionPreset]

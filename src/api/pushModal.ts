@@ -2,7 +2,6 @@ import { genModalId } from '../core/Modal/genModalId';
 import { buildModal, popModal, pushModal } from '../core/Modal/store';
 import { IModalOptions, INotValidatedModalProps, ModalContent } from '../core/Modal/types';
 import RmoStack from '../core/RmoStack';
-import { genRmoStackId } from '../core/RmoStack/genRmoStackId';
 import { Id } from '../types';
 import { isId } from '../utils/propValidator';
 
@@ -19,8 +18,7 @@ function getModalId(options?: IModalOptions) {
 function mergeOptions(options?: IModalOptions) {
 	return {
 		...options,
-		modalId: getModalId(options),
-		rmoStackId: genRmoStackId()
+		modalId: getModalId(options)
 	} as INotValidatedModalProps;
 }
 
@@ -35,13 +33,16 @@ export default async function (content: ModalContent, options?: IModalOptions): 
 		const mergedOptions = mergeOptions(options);
 		const modal = buildModal(content, mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.rmoStackId, onPopState: () => popModal(options?.containerId) });
+		await RmoStack.push({ id: mergedOptions.modalId, onPopState: () => popModal(options?.containerId) });
 
 		pushModal(modal);
 
 		return mergedOptions.modalId;
 	} catch (error) {
-		console.error(error);
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error);
+		}
+
 		return null;
 	}
 }

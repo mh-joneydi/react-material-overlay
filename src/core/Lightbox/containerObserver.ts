@@ -57,7 +57,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: ILightb
 			throw new Error('lightbox is already opened!');
 		}
 
-		const { lightboxId, rmoStackId } = options;
+		const { lightboxId } = options;
 
 		const closeLightbox = async () => {
 			if (shouldIgnorePop(lightboxId)) {
@@ -65,7 +65,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: ILightb
 			}
 
 			popLightbox();
-			await RmoStack.pop({ id: rmoStackId, preventEventTriggering: true });
+			await RmoStack.pop({ id: lightboxId, preventEventTriggering: true });
 		};
 
 		lightboxCount++;

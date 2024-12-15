@@ -2,7 +2,6 @@ import { genAlertDialogId } from '../core/AlertDialog/genAlertDialogId';
 import { buildAlertDialog, popAlertDialog, pushAlertDialog } from '../core/AlertDialog/store';
 import { IAlertDialogOptions, INotValidatedAlertDialogProps } from '../core/AlertDialog/types';
 import RmoStack from '../core/RmoStack';
-import { genRmoStackId } from '../core/RmoStack/genRmoStackId';
 import { Id } from '../types';
 import { isId } from '../utils/propValidator';
 
@@ -19,8 +18,7 @@ function getAlertDialogId(options?: IAlertDialogOptions) {
 function mergeOptions(options?: IAlertDialogOptions) {
 	return {
 		...options,
-		alertDialogId: getAlertDialogId(options),
-		rmoStackId: genRmoStackId()
+		alertDialogId: getAlertDialogId(options)
 	} as INotValidatedAlertDialogProps;
 }
 
@@ -35,13 +33,19 @@ export default async function (options?: IAlertDialogOptions): Promise<Id | null
 		const mergedOptions = mergeOptions(options);
 		const alertDialog = buildAlertDialog(mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.rmoStackId, onPopState: () => popAlertDialog(options?.containerId) });
+		await RmoStack.push({
+			id: mergedOptions.alertDialogId,
+			onPopState: () => popAlertDialog(options?.containerId)
+		});
 
 		pushAlertDialog(alertDialog);
 
 		return mergedOptions.alertDialogId;
 	} catch (error) {
-		console.error(error);
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error);
+		}
+
 		return null;
 	}
 }

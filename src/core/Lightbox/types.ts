@@ -158,6 +158,10 @@ export interface ILightboxOptions extends ILightboxCommonOptions {
 	 */
 	containerId?: Id;
 	/**
+	 * Set a custom `lightboxId` for prevent duplicating
+	 */
+	lightboxId?: Id;
+	/**
 	 * Called when lightbox is mounted.
 	 */
 	onOpen?: () => void;
@@ -190,7 +194,6 @@ export interface ILightboxOptions extends ILightboxCommonOptions {
 export interface ILightboxProps extends ILightboxOptions {
 	lightboxId: Id;
 	containerId: Id;
-	rmoStackId: Id;
 	show: boolean;
 	closeLightbox: () => Promise<void>;
 	deleteLightbox: () => void;
@@ -199,5 +202,4 @@ export interface ILightboxProps extends ILightboxOptions {
 
 export interface INotValidatedLightboxProps extends Partial<ILightboxProps> {
 	lightboxId: Id;
-	rmoStackId: Id;
 }
