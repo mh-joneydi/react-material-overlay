@@ -12,10 +12,9 @@ import {
 
 import { ICloseButtonProps } from '../../components/CloseButton';
 import { transitionPreset } from '../../components/getPresetTransitionComponent';
-import { ModalHeaderProps } from '../../components/Modal/ModalHeader';
 import { Id } from '../../types';
 
-export type IFrequentlyUsedDialogProps = Pick<
+export type IModalFrequentlyUsedDialogProps = Pick<
 	DialogProps,
 	| 'fullScreen'
 	| 'fullWidth'
@@ -30,12 +29,47 @@ export type IFrequentlyUsedDialogProps = Pick<
 	| 'slotProps'
 >;
 
-export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
+export interface IModalContentWrapperProps
+	extends Pick<
+		IModalProps,
+		| 'containerId'
+		| 'modalId'
+		| 'contentWrapperProps'
+		| 'fullScreen'
+		| 'fullWidth'
+		| 'maxWidth'
+		| 'scroll'
+		| 'transitionPreset'
+		| 'transitionProps'
+		| 'closeModal'
+	> {
+	children: React.ReactNode;
+}
+
+export interface IModalHeaderProps
+	extends Pick<
+		IModalProps,
+		| 'containerId'
+		| 'modalId'
+		| 'title'
+		| 'subheader'
+		| 'headerProps'
+		| 'fullScreen'
+		| 'scroll'
+		| 'maxWidth'
+		| 'transitionPreset'
+		| 'transitionProps'
+		| 'closeModal'
+	> {
+	closeButton?: React.ReactNode;
+}
+
+export interface IModalCommonOptions extends IModalFrequentlyUsedDialogProps {
 	/**
 	 * Pass a custom close button.
 	 * To remove the close button pass `false`
 	 *
-	 * By default, the closeButton element is [`IconButton`]('https://mui.com/material-ui/api/icon-button/')
+	 * By default, the closeButton element is [`IconButton`](https://mui.com/material-ui/api/icon-button/)
 	 */
 	closeButton?: boolean | ((props: ICloseButtonProps) => React.ReactNode) | React.ReactElement<ICloseButtonProps>;
 	/**
@@ -57,7 +91,7 @@ export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
 	 */
 	raw?: boolean;
 	/**
-	 * Adjust the transition with [`preset Transitions`]('https://mui.com/material-ui/transitions/').
+	 * Adjust the transition with [`preset Transitions`](https://mui.com/material-ui/transitions/).
 	 *
 	 * If you want more customization, use `TransitionComponent` prop.
 	 *
@@ -91,20 +125,36 @@ export interface IModalCommonOptions extends IFrequentlyUsedDialogProps {
 		| 'children'
 		| 'TransitionProps'
 		| 'classes'
-		| keyof IFrequentlyUsedDialogProps
+		| keyof IModalFrequentlyUsedDialogProps
 	>;
 	/**
-	 * Pass a custom Modal Header
+	 * Pass a custom Modal Header or `false` to remove header
 	 *
-	 * By default, the Header element is [`CardHeader`]('https://mui.com/material-ui/api/card-header/')
+	 * By default, the Header element is [`CardHeader`](https://mui.com/material-ui/api/card-header/)
 	 */
-	header?: boolean | ((params: ModalHeaderProps) => React.ReactNode) | React.ReactElement<ModalHeaderProps>;
+	header?: boolean | ((params: IModalHeaderProps) => React.ReactNode) | React.ReactElement<IModalHeaderProps>;
 	/**
 	 * Props for the Header component
 	 *
 	 *  @see {@link https://mui.com/material-ui/api/card-header/#props} for more details.
 	 */
 	headerProps?: Omit<CardHeaderProps, 'children' | 'title' | 'subheader'>;
+	/**
+	 * Pass a custom Modal content wrapper or `false` to remove wrapper
+	 *
+	 * By default, the Content wrapper element is a [`Box`](https://mui.com/material-ui/api/box/)
+	 *
+	 * @example
+	 * ```
+	 * pushModal("content", {
+	 * 	contentWrapper: ({ children, ...otherProps })=> <MyContentWrapper>{children}</MyContentWrapper>
+	 * })
+	 * ```
+	 */
+	contentWrapper?:
+		| boolean
+		| ((params: IModalContentWrapperProps) => React.ReactNode)
+		| React.ReactElement<IModalContentWrapperProps>;
 	/**
 	 * Props for the wrapper component of content
 	 *

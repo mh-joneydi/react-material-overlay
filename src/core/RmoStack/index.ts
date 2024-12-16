@@ -179,7 +179,7 @@ const RmoStack = {
 	pop: ((params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<void> => {
 		return mutex.runExclusive(async () => {
 			if (isNum(params)) {
-				if (process.env.NODE_ENV !== 'production' && params < 2) {
+				if (params < 2) {
 					console.warn('for multiple pops, count must be at least 2, otherwise use pop without count parameter.');
 				}
 

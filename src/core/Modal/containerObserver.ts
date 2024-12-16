@@ -77,10 +77,11 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			closeButton: defaultCloseButton,
 			header: defaultHeader,
 			closeButtonIcon: defaultCloseButtonIcon,
+			contentWrapper: defaultContentWrapper,
 			..._defaultOptions
 		} = defaultOptions;
 
-		const { classes, closeButton, header, closeButtonIcon, sx, ...modalOptions } = options;
+		const { classes, closeButton, header, closeButtonIcon, sx, contentWrapper, ...modalOptions } = options;
 
 		const modalProps = {
 			...enhancedMerge(_defaultOptions, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
@@ -144,6 +145,14 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			modalProps.header = header;
 		} else if (header === true) {
 			modalProps.header = canBeRendered(defaultHeader) ? defaultHeader : true;
+		}
+
+		modalProps.contentWrapper = defaultContentWrapper;
+
+		if (contentWrapper === false || canBeRendered(contentWrapper)) {
+			modalProps.contentWrapper = contentWrapper;
+		} else if (contentWrapper === true) {
+			modalProps.contentWrapper = canBeRendered(defaultContentWrapper) ? defaultContentWrapper : true;
 		}
 
 		let modalContent = content;

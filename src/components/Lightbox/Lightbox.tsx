@@ -20,6 +20,8 @@ import { ILightboxProps } from '../../core/Lightbox/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 
+import YarlStylesEmotionCacheProvider from './YarlStylesEmotionCacheProvider';
+
 const Lightbox = ({
 	show,
 	closeLightbox,
@@ -86,9 +88,11 @@ const Lightbox = ({
 
 	return (
 		<>
-			{captions ? <Global styles={css(yarlCaptionsPluginStyles as string)} /> : null}
-			{counter ? <Global styles={css(yarlCounterPluginStyles as string)} /> : null}
-			{thumbnails ? <Global styles={css(yarlThumbnailsPluginStyles as string)} /> : null}
+			<YarlStylesEmotionCacheProvider>
+				{captions ? <Global styles={css(yarlCaptionsPluginStyles as string)} /> : null}
+				{counter ? <Global styles={css(yarlCounterPluginStyles as string)} /> : null}
+				{thumbnails ? <Global styles={css(yarlThumbnailsPluginStyles as string)} /> : null}
+			</YarlStylesEmotionCacheProvider>
 
 			<YetAnotherReactLightbox
 				slides={slides}

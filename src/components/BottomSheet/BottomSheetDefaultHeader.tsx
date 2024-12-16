@@ -1,21 +1,24 @@
 import { CardHeader } from '@mui/material';
 
-import { BottomSheetHeaderProps } from '../../core/BottomSheet/types';
+import { IBottomSheetHeaderProps } from '../../core';
 import { isFn } from '../../utils';
 
-export default function BottomSheetDefaultHeader({ bottomSheetProps, closeButton }: BottomSheetHeaderProps) {
+export default function BottomSheetDefaultHeader({
+	closeButton,
+	headerProps,
+	title,
+	subheader
+}: IBottomSheetHeaderProps) {
 	return (
 		<CardHeader
-			{...(bottomSheetProps.headerProps ?? {})}
+			{...(headerProps ?? {})}
 			sx={(theme) => ({
 				padding: 0,
 				textAlign: 'left',
-				...(isFn(bottomSheetProps.headerProps?.sx)
-					? (bottomSheetProps.headerProps.sx as Function)(theme)
-					: (bottomSheetProps.headerProps?.sx ?? {}))
+				...(isFn(headerProps?.sx) ? (headerProps.sx as Function)(theme) : (headerProps?.sx ?? {}))
 			})}
-			title={bottomSheetProps.title}
-			subheader={bottomSheetProps.subheader}
+			title={title}
+			subheader={subheader}
 			action={closeButton}
 		/>
 	);

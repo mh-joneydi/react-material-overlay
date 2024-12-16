@@ -1,14 +1,15 @@
 import React from 'react';
-import { Box, Dialog } from '@mui/material';
+import { Dialog } from '@mui/material';
 
-import { IModalProps } from '../../core/Modal/types';
+import { IModalContentWrapperProps, IModalHeaderProps, IModalProps } from '../../core/Modal/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
 
-import ModalHeader, { ModalHeaderProps } from './ModalHeader';
+import ModalContentWrapper from './ModalContentWrapper';
+import ModalHeader from './ModalHeader';
 
 const Modal = ({
 	children,
@@ -41,7 +42,9 @@ const Modal = ({
 	header,
 	subheader,
 	slotProps,
-	modalId
+	modalId,
+	contentWrapper,
+	containerId
 }: IModalProps) => {
 	const sequenceNumber = useRmoStackItemIndex(modalId);
 	const PresetTransitionComponent = React.useMemo(
@@ -77,7 +80,7 @@ const Modal = ({
 		Close = CloseButton(_closeButtonProps);
 	}
 
-	const _headerProps: ModalHeaderProps = {
+	const _headerProps: IModalHeaderProps = {
 		closeButton: Close,
 		headerProps,
 		fullScreen,
@@ -87,6 +90,8 @@ const Modal = ({
 		title,
 		transitionPreset,
 		transitionProps,
+		containerId,
+		modalId,
 		closeModal
 	};
 
@@ -100,6 +105,32 @@ const Modal = ({
 		Header = React.cloneElement(header, _headerProps);
 	} else {
 		Header = ModalHeader(_headerProps);
+	}
+
+	const _contentWrapperProps: IModalContentWrapperProps = {
+		fullScreen,
+		maxWidth,
+		scroll,
+		contentWrapperProps,
+		modalId,
+		containerId,
+		fullWidth,
+		transitionPreset,
+		transitionProps,
+		closeModal,
+		children: content
+	};
+
+	let WrappedContent: React.ReactNode;
+
+	if (contentWrapper === false) {
+		WrappedContent = content;
+	} else if (isFn(contentWrapper)) {
+		WrappedContent = contentWrapper(_contentWrapperProps);
+	} else if (React.isValidElement(contentWrapper)) {
+		WrappedContent = React.cloneElement(contentWrapper, _contentWrapperProps);
+	} else {
+		WrappedContent = ModalContentWrapper(_contentWrapperProps);
 	}
 
 	return (
@@ -129,20 +160,7 @@ const Modal = ({
 				content
 			) : (
 				<React.Fragment>
-					{Header}
-					<Box
-						padding={2}
-						paddingTop={0}
-						{...(contentWrapperProps ?? {})}
-						sx={(theme) => ({
-							overflow: scroll === 'paper' ? 'auto' : undefined,
-							...(isFn(contentWrapperProps?.sx)
-								? (contentWrapperProps.sx as Function)(theme)
-								: (contentWrapperProps?.sx ?? {}))
-						})}
-					>
-						{content}
-					</Box>
+					{Header} {WrappedContent}
 				</React.Fragment>
 			)}
 		</Dialog>

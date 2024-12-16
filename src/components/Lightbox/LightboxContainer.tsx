@@ -7,6 +7,7 @@ import { useLightboxContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import Lightbox from './Lightbox';
+import YarlStylesEmotionCacheProvider from './YarlStylesEmotionCacheProvider';
 
 export const defaultProps: ILightboxContainerProps = {
 	defaultOptions: {
@@ -30,7 +31,10 @@ export default function LightboxContainer(props: Partial<ILightboxContainerProps
 
 	return (
 		<>
-			<Global styles={css(yarlStyles as string)} />
+			<YarlStylesEmotionCacheProvider>
+				<Global styles={css(yarlStyles as string)} />
+			</YarlStylesEmotionCacheProvider>
+
 			<GlobalStyles
 				styles={(theme) => ({
 					':root': {

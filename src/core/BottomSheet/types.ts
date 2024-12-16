@@ -29,12 +29,47 @@ export interface IBottomSheetCustomRenderProps {
 
 export type BottomSheetContentProps = IBottomSheetCustomRenderProps;
 export type BottomSheetFooterProps = IBottomSheetCustomRenderProps;
-export type BottomSheetHeaderProps = IBottomSheetCustomRenderProps & {
-	closeButton?: React.ReactNode;
-};
+
 export type BottomSheetSiblingProps = IBottomSheetCustomRenderProps;
 
 export type BottomSheetRef = RSBSBottomSheetRef;
+
+export interface IBottomSheetHeaderProps
+	extends Pick<
+		IBottomSheetProps,
+		| 'closeBottomSheet'
+		| 'bottomSheetId'
+		| 'defaultSnap'
+		| 'expandOnContentDrag'
+		| 'containerId'
+		| 'maxHeight'
+		| 'snapPoints'
+		| 'title'
+		| 'subheader'
+		| 'headerProps'
+		| 'scrollLocking'
+		| 'reserveScrollBarGap'
+		| 'blocking'
+	> {
+	closeButton?: React.ReactNode;
+}
+export interface IBottomSheetContentWrapperProps
+	extends Pick<
+		IBottomSheetProps,
+		| 'closeBottomSheet'
+		| 'bottomSheetId'
+		| 'contentWrapperProps'
+		| 'defaultSnap'
+		| 'expandOnContentDrag'
+		| 'containerId'
+		| 'maxHeight'
+		| 'snapPoints'
+		| 'scrollLocking'
+		| 'reserveScrollBarGap'
+		| 'blocking'
+	> {
+	children: React.ReactNode;
+}
 
 export interface IBottomSheetCommonOptions extends RSBSProps {
 	/**
@@ -73,13 +108,29 @@ export interface IBottomSheetCommonOptions extends RSBSProps {
 	 *
 	 * otherwise default value is `true`
 	 */
-	header?: boolean | React.ReactNode | ((props: BottomSheetHeaderProps) => React.ReactNode);
+	header?: boolean | React.ReactNode | ((props: IBottomSheetHeaderProps) => React.ReactNode);
 	/**
 	 * Props for the Header component
 	 *
 	 *  @see {@link https://mui.com/material-ui/api/card-header/#props} for more details.
 	 */
 	headerProps?: Omit<CardHeaderProps, 'children' | 'title' | 'subheader'>;
+	/**
+	 * Pass a custom Modal content wrapper or `false` to remove wrapper
+	 *
+	 * By default, the Content wrapper element is a [`Box`](https://mui.com/material-ui/api/box/)
+	 *
+	 * @example
+	 * ```
+	 * pushBottomSheet("content", {
+	 * 	contentWrapper: ({ children, ...otherProps })=> <MyContentWrapper>{children}</MyContentWrapper>
+	 * })
+	 * ```
+	 */
+	contentWrapper?:
+		| boolean
+		| ((params: IBottomSheetContentWrapperProps) => React.ReactNode)
+		| React.ReactElement<IBottomSheetContentWrapperProps>;
 	/**
 	 * Props for the wrapper component of content
 	 *

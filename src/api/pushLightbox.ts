@@ -38,9 +38,7 @@ export default async function (options?: ILightboxOptions): Promise<Id | null> {
 
 		return mergedOptions.lightboxId;
 	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') {
-			console.error(error);
-		}
+		console.error(error);
 
 		return null;
 	}

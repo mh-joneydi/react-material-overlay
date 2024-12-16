@@ -39,9 +39,7 @@ export default async function (content: ModalContent, options?: IModalOptions): 
 
 		return mergedOptions.modalId;
 	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') {
-			console.error(error);
-		}
+		console.error(error);
 
 		return null;
 	}

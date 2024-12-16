@@ -19,7 +19,7 @@ export interface IActionButtonsProps {
 	closeAlertDialog: IAlertDialogProps['closeAlertDialog'];
 }
 
-export type IFrequentlyUsedDialogProps = Pick<
+export type IAlertDialogFrequentlyUsedDialogProps = Pick<
 	DialogProps,
 	| 'fullScreen'
 	| 'fullWidth'
@@ -34,7 +34,7 @@ export type IFrequentlyUsedDialogProps = Pick<
 	| 'slotProps'
 >;
 
-export interface IAlertDialogCommonOptions extends IFrequentlyUsedDialogProps {
+export interface IAlertDialogCommonOptions extends IAlertDialogFrequentlyUsedDialogProps {
 	/**
 	 * ok action button label
 	 *
@@ -100,7 +100,7 @@ export interface IAlertDialogCommonOptions extends IFrequentlyUsedDialogProps {
 		| 'children'
 		| 'TransitionProps'
 		| 'classes'
-		| keyof IFrequentlyUsedDialogProps
+		| keyof IAlertDialogFrequentlyUsedDialogProps
 	>;
 	/**
 	 * Props for the DialogTitle component

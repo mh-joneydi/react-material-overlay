@@ -31,5 +31,5 @@ interface PopParams {
  * ```
  */
 export default function pop(param?: number | PopParams) {
-	return RmoStack.pop(param as number);
+	return RmoStack.pop(param as any);
 }

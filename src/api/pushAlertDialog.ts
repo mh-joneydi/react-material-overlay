@@ -42,9 +42,7 @@ export default async function (options?: IAlertDialogOptions): Promise<Id | null
 
 		return mergedOptions.alertDialogId;
 	} catch (error) {
-		if (process.env.NODE_ENV !== 'production') {
-			console.error(error);
-		}
+		console.error(error);
 
 		return null;
 	}
