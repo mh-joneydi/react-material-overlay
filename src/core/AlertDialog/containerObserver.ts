@@ -1,5 +1,3 @@
-import { merge } from 'lodash';
-
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
@@ -71,9 +69,9 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 
 		alertDialogCount++;
 
-		const { sx: defaultSx, classes: defaultClasses, ...containerProps } = defaultOptions;
+		const { classes: defaultClasses, ...containerProps } = defaultOptions;
 
-		const { classes, sx, ...alertDialogOptions } = options;
+		const { classes, ...alertDialogOptions } = options;
 
 		const alertDialogProps = {
 			...enhancedMerge(
@@ -102,17 +100,6 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 				notify();
 			}
 		} as IAlertDialogProps;
-
-		if (defaultSx && sx) {
-			alertDialogProps.sx = (theme) =>
-				merge(
-					{},
-					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
-					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
-				);
-		} else {
-			alertDialogProps.sx = sx || defaultSx;
-		}
 
 		if (isFn(classes)) {
 			alertDialogProps.classes = classes(defaultClasses);

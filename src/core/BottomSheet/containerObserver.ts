@@ -1,6 +1,5 @@
 import React from 'react';
 import clsx from 'clsx';
-import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
@@ -80,7 +79,6 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 		bottomSheetCount++;
 
 		const {
-			sx: defaultSx,
 			className: defaultClassName,
 			footer: defaultFooter,
 			header: defaultHeader,
@@ -89,7 +87,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			...containerProps
 		} = defaultOptions;
 
-		const { sx, className, footer, sibling, header, closeButton, ...bottomSheetOptions } = options;
+		const { className, footer, sibling, header, closeButton, ...bottomSheetOptions } = options;
 
 		const bottomSheetProps = {
 			...enhancedMerge(
@@ -118,17 +116,6 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 				notify();
 			}
 		} as IBottomSheetProps;
-
-		if (defaultSx && sx) {
-			bottomSheetProps.sx = (theme) =>
-				merge(
-					{},
-					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
-					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
-				);
-		} else {
-			bottomSheetProps.sx = sx || defaultSx;
-		}
 
 		if (isFn(className)) {
 			bottomSheetProps.className = className(defaultClassName);

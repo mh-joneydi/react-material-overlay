@@ -1,5 +1,4 @@
 import React from 'react';
-import { merge } from 'lodash';
 
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
@@ -72,7 +71,6 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 		modalCount++;
 
 		const {
-			sx: defaultSx,
 			classes: defaultClasses,
 			closeButton: defaultCloseButton,
 			header: defaultHeader,
@@ -81,7 +79,7 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			..._defaultOptions
 		} = defaultOptions;
 
-		const { classes, closeButton, header, closeButtonIcon, sx, contentWrapper, ...modalOptions } = options;
+		const { classes, closeButton, header, closeButtonIcon, contentWrapper, ...modalOptions } = options;
 
 		const modalProps = {
 			...enhancedMerge(_defaultOptions, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
@@ -107,17 +105,6 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 				notify();
 			}
 		} as IModalProps;
-
-		if (defaultSx && sx) {
-			modalProps.sx = (theme) =>
-				merge(
-					{},
-					isFn(defaultSx) ? (defaultSx as Function)(theme) : (defaultSx ?? {}),
-					isFn(sx) ? (sx as Function)(theme) : (sx ?? {})
-				);
-		} else {
-			modalProps.sx = sx || defaultSx;
-		}
 
 		if (isFn(classes)) {
 			modalProps.classes = classes(defaultClasses);
