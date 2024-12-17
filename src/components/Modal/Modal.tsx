@@ -5,6 +5,7 @@ import { IModalContentWrapperProps, IModalHeaderProps, IModalProps } from '../..
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
+import CloseButtonIcon from '../CloseButtonIcon';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
 
@@ -65,7 +66,9 @@ const Modal = ({
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeModal,
-		icon: isFn(closeButtonIcon) ? closeButtonIcon({ transitionPreset, transitionProps, fullScreen }) : closeButtonIcon
+		icon: isFn(closeButtonIcon)
+			? closeButtonIcon({ transitionPreset, transitionProps, fullScreen })
+			: closeButtonIcon || <CloseButtonIcon />
 	};
 
 	let Close: React.ReactNode = null;

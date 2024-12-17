@@ -1,4 +1,5 @@
 import React from 'react';
+import { isNull, omitBy } from 'lodash';
 
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
@@ -82,7 +83,7 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 		const { classes, closeButton, header, closeButtonIcon, contentWrapper, ...modalOptions } = options;
 
 		const modalProps = {
-			...enhancedMerge(_defaultOptions, Object.fromEntries(Object.entries(modalOptions).filter(([, v]) => v != null))),
+			...enhancedMerge(_defaultOptions, omitBy(modalOptions, isNull)),
 			modalId,
 			containerId,
 			closeModal,

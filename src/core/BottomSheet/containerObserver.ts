@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { isNull, omitBy } from 'lodash';
 
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
@@ -90,10 +91,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 		const { className, footer, sibling, header, closeButton, ...bottomSheetOptions } = options;
 
 		const bottomSheetProps = {
-			...enhancedMerge(
-				containerProps,
-				Object.fromEntries(Object.entries(bottomSheetOptions).filter(([, v]) => v != null))
-			),
+			...enhancedMerge(containerProps, omitBy(bottomSheetOptions, isNull)),
 			bottomSheetId,
 			containerId: id,
 			closeBottomSheet,

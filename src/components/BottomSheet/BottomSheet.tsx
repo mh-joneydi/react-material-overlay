@@ -11,6 +11,7 @@ import {
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
+import CloseButtonIcon from '../CloseButtonIcon';
 import SuspenseFallback from '../SuspenseFallback';
 
 import BottomSheetContentWrapper from './BottomSheetContentWrapper';
@@ -61,7 +62,7 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeBottomSheet,
-		icon: closeButtonIcon
+		icon: closeButtonIcon || <CloseButtonIcon />
 	};
 
 	let Close: React.ReactNode = null;

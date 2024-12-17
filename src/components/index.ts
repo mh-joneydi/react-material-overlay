@@ -3,6 +3,7 @@ export { default as BottomSheetContainer } from './BottomSheet/BottomSheetContai
 export { default as DefaultBottomSheetContentWrapperComponent } from './BottomSheet/BottomSheetContentWrapper';
 export { default as DefaultBottomSheetHeaderComponent } from './BottomSheet/BottomSheetDefaultHeader';
 export type { ICloseButtonProps } from './CloseButton';
+export type { default as DefaultCloseButtonIcon } from './CloseButtonIcon';
 export { default as LightboxContainer } from './Lightbox/LightboxContainer';
 export { default as ModalContainer } from './Modal/ModalContainer';
 export { default as DefaultModalContentWrapperComponent } from './Modal/ModalContentWrapper';

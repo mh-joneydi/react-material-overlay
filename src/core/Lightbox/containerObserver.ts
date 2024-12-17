@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { merge } from 'lodash';
+import { isNull, merge, omitBy } from 'lodash';
 
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
@@ -75,10 +75,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: ILightb
 		const { className, styles, ...lightboxOptions } = options;
 
 		const lightboxProps = {
-			...enhancedMerge(
-				containerProps,
-				Object.fromEntries(Object.entries(lightboxOptions).filter(([, v]) => v != null))
-			),
+			...enhancedMerge(containerProps, omitBy(lightboxOptions, isNull)),
 			lightboxId,
 			containerId: id,
 			closeLightbox,

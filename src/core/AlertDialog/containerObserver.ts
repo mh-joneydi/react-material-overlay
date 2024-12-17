@@ -1,3 +1,5 @@
+import { isNull, omitBy } from 'lodash';
+
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
@@ -74,10 +76,7 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 		const { classes, ...alertDialogOptions } = options;
 
 		const alertDialogProps = {
-			...enhancedMerge(
-				containerProps,
-				Object.fromEntries(Object.entries(alertDialogOptions).filter(([, v]) => v != null))
-			),
+			...enhancedMerge(containerProps, omitBy(alertDialogOptions, isNull)),
 			alertDialogId,
 			containerId: id,
 			closeAlertDialog,
