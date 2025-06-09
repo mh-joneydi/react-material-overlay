@@ -28,14 +28,6 @@ npm install react-material-overlay
 
 ```
 
-Or with yarn:
-
-```bash
-
-yarn add react-material-overlay
-
-```
-
 ### Peer Dependencies
 
 ```bash
@@ -43,6 +35,25 @@ yarn add react-material-overlay
 npm install @mui/material @emotion/react @emotion/styled
 
 ```
+
+## Table of Contents
+
+- [Usage](#usage)
+  - [Basic Example](#basic-example)
+  - [Modal Overlay](#modal-overlay)
+  - [Alert Dialog Overlay](#alert-dialog-overlay)
+  - [Lightbox Overlay](#lightbox-overlay)
+  - [Bottom Sheet Overlay](#bottom-sheet-overlay)
+  - [Closing Overlays](#closing-overlays)
+  - [Custom Overlays](#custom-overlays)
+  - [Caveats](#caveats)
+- API Reference
+  - [Modal](#modal)
+  - [Alert Dialog](#alert-dialog)
+  - [Lightbox](#lightbox)
+  - [Bottom Sheet](#bottom-sheet)
+  - [Close APIs](#close-apis)
+  - [RmoStack](#rmostack)
 
 ## Usage
 
@@ -94,7 +105,9 @@ function App() {
 export default App;
 ```
 
-### **Modal**
+---
+
+### **Modal Overlay**
 
 ![image](https://github.com/user-attachments/assets/4f95fb62-308c-44cf-a293-94d1ae909417)
 
@@ -130,7 +143,9 @@ const App = () => {
 };
 ```
 
-### **Alert Dialog**
+---
+
+### **Alert Dialog Overlay**
 
 ![image](https://github.com/user-attachments/assets/a41e426e-5027-4938-b483-8955a9423dd5)
 
@@ -184,7 +199,9 @@ const App = () => {
 };
 ```
 
-### **Lightbox**
+---
+
+### **Lightbox Overlay**
 
 ![yarl](https://github.com/user-attachments/assets/5d049ff4-2cc7-4c59-93c6-21c48c8d617c)
 
@@ -217,11 +234,13 @@ const App = () => {
 };
 ```
 
-### **Bottom Sheet**
+---
+
+### **Bottom Sheet Overlay**
 
 ![rsbs](https://github.com/user-attachments/assets/f57a0164-2a4a-47dc-9aee-0e3aa152d896)
 
-> Implemented and integrated with [react-spring-bottom-sheet](https://react-spring.bottom-sheet.dev/) based on _MUI Theme_.
+> Implemented and integrated with [react-spring-bottom-sheet](https://github.com/stipsan/react-spring-bottom-sheet) based on _MUI Theme_.
 
 Bottom sheets slide up from the bottom of the screen, providing contextual or additional information without taking the user away from their current task. Common use cases include action sheets, menus or displaying information in mobile interfaces.
 
@@ -253,10 +272,12 @@ const App = () => {
 };
 ```
 
-### Managing Overlays
+---
 
-- **Closing Overlays**: You can manually close an overlay by using the `pop` method or allowing the user to close it via UI elements like backdrop clicks.
-- **Flush Overlays**: To close all overlays at once, use the `flush` method.
+### **Closing Overlays**
+
+- **pop**: You can manually close an overlay by using the `pop` method or allowing the user to close it via UI elements like backdrop clicks.
+- **flush**: To close all overlays at once, use the `flush` method.
 
 #### Example
 
@@ -273,7 +294,9 @@ const App = () => {
 }
 ```
 
-### Custom Overlays with `RmoStack`
+---
+
+### Custom Overlays
 
 For cases where you want to have your own custom overlay and use the stacking features, browser history sync and etc. you can easily do this using `RmoStack`.
 
@@ -320,6 +343,8 @@ const App = () => {
 	);
 };
 ```
+
+---
 
 ### Caveats
 
@@ -383,6 +408,8 @@ flush().then(() => {
 	navigate('/some-path');
 });
 ```
+
+---
 
 ## API Reference
 
@@ -711,7 +738,7 @@ await flush();
 
 ---
 
-### RmoStack API Reference
+### RmoStack
 
 The `RmoStack` module provides methods for managing a stack with integration into the browser's history state. This allows developers to push, pop, and flush items while handling event listeners for each item.
 

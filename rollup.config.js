@@ -40,5 +40,5 @@ export default {
 			}
 		})
 	],
-	external: ['react', 'react-dom', '@mui/material', '@emotion/styled', '@emotion/react']
+	external: [/@emotion\/.*/, /@mui\/.*/, 'react', 'react-dom', 'async-mutex', 'clsx', 'lodash']
 };
