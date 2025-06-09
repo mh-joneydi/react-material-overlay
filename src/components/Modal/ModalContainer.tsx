@@ -2,19 +2,8 @@ import { IModalContainerProps } from '../../core/Modal/types';
 import { useModalContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
+import defaultProps from './defaultProps';
 import Modal from './Modal';
-
-export const defaultProps: IModalContainerProps = {
-	defaultOptions: {
-		scroll: 'paper',
-		closeOnBackdropClick: true,
-		fullWidth: false,
-		maxWidth: 'sm',
-		fullScreen: false,
-		closeButton: true,
-		header: true
-	}
-};
 
 export default function ModalContainer(props: Partial<IModalContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);

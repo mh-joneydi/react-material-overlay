@@ -796,12 +796,13 @@ The current length of the stack.
 #### Usage Example
 
 ```typescript
-import RmoStack from './path/to/RmoStack';
+import { RmoStack } from 'react-material-overlay';
 
 // Pushing an item onto the stack
 RmoStack.push({
 	id: 'uniqueId',
 	onPopState: () => {
+		// this callback invoked when browser history was poped
 		console.log('Item popped from the stack');
 	}
 }).then(({ id, index }) => {

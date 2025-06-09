@@ -2,11 +2,32 @@
   "name": "react-material-overlay",
   "version": "0.0.5",
   "description": "A fully featured Material UI implementation of overlays like modals, alert dialogs, lightboxes, and bottom sheets featuring easy stack management and browser history integration",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "jsnext:main": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
-  "source": "src/index.ts",
+  "type": "module",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.esm.js",
+  "jsnext:main": "./dist/index.esm.js",
+  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
+  "unpkg": "./dist/index.esm.js",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "node": {
+        "types": "./dist/index.d.ts",
+        "module-sync": "./dist/index.esm.js",
+        "default": "./dist/index.cjs.js"
+      },
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      },
+      "default": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.esm.js"
+      }
+    },
+    "./*": null
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean & rollup -c",
@@ -49,47 +70,65 @@
   "peerDependencies": {
     "@emotion/react": ">=11.13",
     "@emotion/styled": ">=11.13",
-    "@mui/material": ">=6",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "@mui/material": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "@types/react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "@types/react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@types/react": {
+      "optional": true
+    },
+    "@types/react-dom": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "@emotion/react": "^11.13.3",
-    "@emotion/styled": "^11.13.0",
-    "@mui/material": "^6.1.1",
-    "@rollup/plugin-commonjs": "^26.0.1",
-    "@rollup/plugin-node-resolve": "^15.2.4",
-    "@rollup/plugin-typescript": "^12.1.0",
-    "@types/lodash": "^4.17.9",
-    "@types/react": "^18.3.8",
-    "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^8.6.0",
-    "@typescript-eslint/parser": "^8.6.0",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.36.1",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@eslint/js": "^9.28.0",
+    "@mui/material": "^7.1.1",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/lodash": "^4.17.17",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "@typescript-eslint/parser": "^8.33.1",
+    "async-mutex": "^0.5.0",
+    "clsx": "^2.1.1",
+    "eslint": "^9.28.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "prettier": "^3.3.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "lodash": "^4.17.21",
+    "prettier": "^3.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "rimraf": "^6.0.1",
-    "rollup": "^2.79.1",
+    "rollup": "^4.42.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-terser": "^7.0.2",
-    "tslib": "^2.7.0",
-    "typescript": "^5.6.2"
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.1"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "dependencies": {
+  "optionalDependencies": {
+    "@types/lodash": "^4.17.17",
     "async-mutex": "^0.5.0",
     "clsx": "^2.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.21"
+  },
+  "dependencies": {
     "react-spring-bottom-sheet": "^3.4.1",
-    "yet-another-react-lightbox": "^3.21.6"
+    "yet-another-react-lightbox": "^3.23.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   }
 }

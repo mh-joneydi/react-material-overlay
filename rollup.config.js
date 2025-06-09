@@ -13,14 +13,14 @@ export default {
 			format: 'cjs',
 			sourcemap: true,
 			exports: 'named',
-			name: 'reactMaterialOverlay'
+			name: 'ReactMaterialOverlay'
 		},
 		{
 			file: 'dist/index.esm.js',
 			format: 'esm',
 			sourcemap: true,
 			exports: 'named',
-			name: 'reactMaterialOverlay'
+			name: 'ReactMaterialOverlay'
 		}
 	],
 	plugins: [

@@ -37,7 +37,7 @@ export interface SinglePopOptions {
  * @param {boolean} [preventEventTriggering=false] - If true, prevents triggering events for each item.
  * @private
  */
-async function popMultiple(count: number, preventEventTriggering: boolean = false): Promise<void> {
+async function popMultiple(count: number, preventEventTriggering = false): Promise<void> {
 	const items = stack.splice(-Math.abs(count));
 
 	if (items.length === 0) {
@@ -72,7 +72,7 @@ async function popSingle(options?: SinglePopOptions): Promise<void> {
  * @param {boolean} [preventEventTriggering=false] - If true, prevents triggering the event.
  * @private
  */
-function triggerListener(id: Id, preventEventTriggering: boolean = false): void {
+function triggerListener(id: Id, preventEventTriggering = false): void {
 	if (!preventEventTriggering) {
 		listeners.get(id)?.();
 	}
@@ -100,7 +100,7 @@ function updateHistoryState(): void {
  * @returns {Promise<void>} - A promise that resolves when the state change is complete.
  * @private
  */
-async function popHistoryState(count: number = 1): Promise<void> {
+async function popHistoryState(count = 1): Promise<void> {
 	return new Promise<void>((resolve) => {
 		function onPopState(e: PopStateEvent) {
 			const stackLength = (e.state?.rmoStackLength as number | null) || 0;
@@ -211,7 +211,7 @@ const RmoStack = {
 	 * @param {boolean} [preventEventTriggering=false] - If `true`, prevents triggering events for each flushed item.
 	 * @returns {Promise<void>} - A promise that resolves when all items are flushed.
 	 */
-	async flush(preventEventTriggering: boolean = false): Promise<void> {
+	async flush(preventEventTriggering = false): Promise<void> {
 		return mutex.runExclusive(async () => {
 			const items = stack.splice(0);
 

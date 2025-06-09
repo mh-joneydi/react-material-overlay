@@ -3,18 +3,7 @@ import { useAlertDialogContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import AlertDialog from './AlertDialog';
-
-export const defaultProps: IAlertDialogContainerProps = {
-	defaultOptions: {
-		scroll: 'paper',
-		closeOnBackdropClick: true,
-		fullWidth: false,
-		maxWidth: 'sm',
-		fullScreen: false,
-		confirmCancelText: 'cancel',
-		confirmOkText: 'ok'
-	}
-};
+import defaultProps from './defaultProps';
 
 export default function AlertDialogContainer(props: Partial<IAlertDialogContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);

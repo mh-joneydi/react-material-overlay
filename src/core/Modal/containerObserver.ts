@@ -7,7 +7,14 @@ import mergeClasses from '../../utils/mergeClasses';
 import { canBeRendered, isFn, isStr } from '../../utils/propValidator';
 import RmoStack from '../RmoStack';
 
-import { IModal, IModalDefaultOptions, IModalProps, INotValidatedModalProps, ModalContent } from './types';
+import {
+	IModal,
+	IModalContentProps,
+	IModalDefaultOptions,
+	IModalProps,
+	INotValidatedModalProps,
+	ModalContent
+} from './types';
 
 export type ContainerObserver = ReturnType<typeof createContainerObserver>;
 
@@ -146,7 +153,7 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 		let modalContent = content;
 
 		if (React.isValidElement(content) && !isStr(content.type)) {
-			modalContent = React.cloneElement(content as React.ReactElement, {
+			modalContent = React.cloneElement(content as React.ReactElement<IModalContentProps>, {
 				closeModal,
 				modalProps
 			});

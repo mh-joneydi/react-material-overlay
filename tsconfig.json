@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"module": "es2015",
-		"target": "es2018",
+		"module": "ESNext",
+		"target": "ESNext",
 		"declarationDir": "./dist",
 		"emitDeclarationOnly": true,
 		"rootDir": "./src",
@@ -10,7 +10,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"lib": ["dom", "dom.iterable", "esnext"],
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
 		"sourceMap": true,
 		"declarationMap": true,
 		"declaration": true,
@@ -20,7 +20,10 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
-		"noFallthroughCasesInSwitch": true
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitOverride": true,
+		"allowJs": false,
+		"isolatedModules": true
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]

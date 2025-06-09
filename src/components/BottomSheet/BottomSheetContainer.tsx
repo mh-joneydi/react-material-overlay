@@ -7,12 +7,7 @@ import { useBottomSheetContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
 import BottomSheet from './BottomSheet';
-
-export const defaultProps: IBottomSheetContainerProps = {
-	defaultOptions: {
-		initialFocusRef: false
-	}
-};
+import defaultProps from './defaultProps';
 
 export default function ModalContainer(props: Partial<IBottomSheetContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);
@@ -21,7 +16,7 @@ export default function ModalContainer(props: Partial<IBottomSheetContainerProps
 
 	return (
 		<>
-			<Global styles={css(rsbsStyles as string)} />
+			<Global styles={css(rsbsStyles)} />
 			<GlobalStyles
 				styles={(theme) => ({
 					':root': {

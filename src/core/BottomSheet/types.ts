@@ -1,4 +1,4 @@
-import { ForwardedRef } from 'react';
+import { ForwardedRef, JSX } from 'react';
 import { BottomSheetProps, BottomSheetRef as RSBSBottomSheetRef } from 'react-spring-bottom-sheet';
 import { BoxProps, CardHeaderProps, IconButtonProps, SxProps, Theme } from '@mui/material';
 

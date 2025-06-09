@@ -6,23 +6,9 @@ import { ILightboxContainerProps } from '../../core/Lightbox/types';
 import { useLightboxContainer } from '../../hooks';
 import enhancedMerge from '../../utils/enhancedMerge';
 
+import defaultProps from './defaultProps';
 import Lightbox from './Lightbox';
 import YarlStylesEmotionCacheProvider from './YarlStylesEmotionCacheProvider';
-
-export const defaultProps: ILightboxContainerProps = {
-	defaultOptions: {
-		zoom: true,
-		zoomOptions: {
-			maxZoomPixelRatio: 20,
-			scrollToZoom: true,
-			zoomInMultiplier: 2
-		},
-		fullscreen: true,
-		noScrollOptions: { disabled: false },
-		captions: true,
-		thumbnails: true
-	}
-};
 
 export default function LightboxContainer(props: Partial<ILightboxContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);
