@@ -9,7 +9,7 @@ import enhancedMerge from '../../utils/enhancedMerge';
 import BottomSheet from './BottomSheet';
 import defaultProps from './defaultProps';
 
-export default function ModalContainer(props: Partial<IBottomSheetContainerProps>) {
+export default function BottomSheetContainer(props: Partial<IBottomSheetContainerProps>) {
 	const containerProps = enhancedMerge(defaultProps, props);
 
 	const { isBottomSheetActive, bottomSheetList } = useBottomSheetContainer(containerProps);

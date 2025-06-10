@@ -45,9 +45,9 @@ npm install @mui/material @emotion/react @emotion/styled
   - [Lightbox Overlay](#lightbox-overlay)
   - [Bottom Sheet Overlay](#bottom-sheet-overlay)
   - [Closing Overlays](#closing-overlays)
-  - [Custom Overlays](#custom-overlays)
-  - [Caveats](#caveats)
-- API Reference
+- [Custom Overlays](#custom-overlays)
+- [Caveats](#caveats)
+- [API Reference](#api-reference)
   - [Modal](#modal)
   - [Alert Dialog](#alert-dialog)
   - [Lightbox](#lightbox)
@@ -296,11 +296,11 @@ const App = () => {
 
 ---
 
-### Custom Overlays
+## Custom Overlays
 
 For cases where you want to have your own custom overlay and use the stacking features, browser history sync and etc. you can easily do this using `RmoStack`.
 
-#### Example
+### Example
 
 ```tsx
 import React from 'react';
@@ -346,7 +346,7 @@ const App = () => {
 
 ---
 
-### Caveats
+## Caveats
 
 > **attention:**
 > Avoid navigating in the app when you have at least one overlay open.
@@ -395,7 +395,7 @@ const App = () => {
 };
 ```
 
-#### With `pop` and `flush` handlers
+### With `pop` and `flush` handlers
 
 ```tsx
 import { pop, flush } from 'react-material-overlay';
