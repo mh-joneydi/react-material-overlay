@@ -34,40 +34,38 @@ export type BottomSheetSiblingProps = IBottomSheetCustomRenderProps;
 
 export type BottomSheetRef = RSBSBottomSheetRef;
 
-export interface IBottomSheetHeaderProps
-	extends Pick<
-		IBottomSheetProps,
-		| 'closeBottomSheet'
-		| 'bottomSheetId'
-		| 'defaultSnap'
-		| 'expandOnContentDrag'
-		| 'containerId'
-		| 'maxHeight'
-		| 'snapPoints'
-		| 'title'
-		| 'subheader'
-		| 'headerProps'
-		| 'scrollLocking'
-		| 'reserveScrollBarGap'
-		| 'blocking'
-	> {
+export interface IBottomSheetHeaderProps extends Pick<
+	IBottomSheetProps,
+	| 'closeBottomSheet'
+	| 'bottomSheetId'
+	| 'defaultSnap'
+	| 'expandOnContentDrag'
+	| 'containerId'
+	| 'maxHeight'
+	| 'snapPoints'
+	| 'title'
+	| 'subheader'
+	| 'headerProps'
+	| 'scrollLocking'
+	| 'reserveScrollBarGap'
+	| 'blocking'
+> {
 	closeButton?: React.ReactNode;
 }
-export interface IBottomSheetContentWrapperProps
-	extends Pick<
-		IBottomSheetProps,
-		| 'closeBottomSheet'
-		| 'bottomSheetId'
-		| 'contentWrapperProps'
-		| 'defaultSnap'
-		| 'expandOnContentDrag'
-		| 'containerId'
-		| 'maxHeight'
-		| 'snapPoints'
-		| 'scrollLocking'
-		| 'reserveScrollBarGap'
-		| 'blocking'
-	> {
+export interface IBottomSheetContentWrapperProps extends Pick<
+	IBottomSheetProps,
+	| 'closeBottomSheet'
+	| 'bottomSheetId'
+	| 'contentWrapperProps'
+	| 'defaultSnap'
+	| 'expandOnContentDrag'
+	| 'containerId'
+	| 'maxHeight'
+	| 'snapPoints'
+	| 'scrollLocking'
+	| 'reserveScrollBarGap'
+	| 'blocking'
+> {
 	children: React.ReactNode;
 }
 
@@ -166,6 +164,10 @@ export interface IBottomSheetCommonOptions extends RSBSProps {
 	 * allows defining additional CSS styles in root element.
 	 */
 	sx?: SxProps<Theme>;
+	/**
+	 * Set custom React Suspense Fallback UI instead default for lazy contents
+	 */
+	reactSuspenseFallback?: React.ReactNode;
 }
 
 export interface IBottomSheetDefaultOptions extends IBottomSheetCommonOptions {
