@@ -32,7 +32,11 @@ export default async function (options?: ILightboxOptions): Promise<Id | null> {
 		const mergedOptions = mergeOptions(options);
 		const lightbox = buildLightbox(mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.lightboxId, onPopState: () => popLightbox(options?.containerId) });
+		await RmoStack.push({
+			id: mergedOptions.lightboxId,
+			onPopState: () => popLightbox(options?.containerId),
+			onRedoState: () => pushLightbox(lightbox)
+		});
 
 		pushLightbox(lightbox);
 

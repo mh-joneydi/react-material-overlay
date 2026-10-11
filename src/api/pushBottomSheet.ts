@@ -33,7 +33,11 @@ export default async function (content: BottomSheetContent, options?: IBottomShe
 		const mergedOptions = mergeOptions(options);
 		const bottomSheet = buildBottomSheet(content, mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.bottomSheetId, onPopState: () => popBottomSheet(options?.containerId) });
+		await RmoStack.push({
+			id: mergedOptions.bottomSheetId,
+			onPopState: () => popBottomSheet(options?.containerId),
+			onRedoState: () => pushBottomSheet(bottomSheet)
+		});
 
 		pushBottomSheet(bottomSheet);
 

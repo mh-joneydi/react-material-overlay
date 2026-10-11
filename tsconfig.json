@@ -16,7 +16,6 @@
 		"declaration": true,
 		"moduleResolution": "node",
 		"jsx": "react-jsx",
-		"noEmit": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,

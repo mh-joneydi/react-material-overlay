@@ -96,6 +96,10 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 			containerId: id,
 			closeBottomSheet,
 			deleteBottomSheet() {
+				if (activeBottomSheets.some((activeId) => activeId === bottomSheetId)) {
+					return;
+				}
+
 				const bottomSheetToRemove = bottomSheets.get(bottomSheetId)!;
 				const { onClose } = bottomSheetToRemove.props;
 

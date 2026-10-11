@@ -33,7 +33,11 @@ export default async function (content: ModalContent, options?: IModalOptions): 
 		const mergedOptions = mergeOptions(options);
 		const modal = buildModal(content, mergedOptions);
 
-		await RmoStack.push({ id: mergedOptions.modalId, onPopState: () => popModal(options?.containerId) });
+		await RmoStack.push({
+			id: mergedOptions.modalId,
+			onPopState: () => popModal(options?.containerId),
+			onRedoState: () => pushModal(modal)
+		});
 
 		pushModal(modal);
 

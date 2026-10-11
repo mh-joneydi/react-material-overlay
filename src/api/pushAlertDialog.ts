@@ -35,7 +35,8 @@ export default async function (options?: IAlertDialogOptions): Promise<Id | null
 
 		await RmoStack.push({
 			id: mergedOptions.alertDialogId,
-			onPopState: () => popAlertDialog(options?.containerId)
+			onPopState: () => popAlertDialog(options?.containerId),
+			onRedoState: () => pushAlertDialog(alertDialog)
 		});
 
 		pushAlertDialog(alertDialog);

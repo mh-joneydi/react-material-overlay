@@ -95,6 +95,10 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 			containerId,
 			closeModal,
 			deleteModal() {
+				if (activeModals.some((activeId) => activeId === modalId)) {
+					return;
+				}
+
 				const modalToRemove = modals.get(modalId)!;
 				const { onClose } = modalToRemove.props;
 

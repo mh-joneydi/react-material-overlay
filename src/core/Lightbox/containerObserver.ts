@@ -80,6 +80,10 @@ export function createContainerObserver(id: Id, containerDefaultOptions: ILightb
 			containerId: id,
 			closeLightbox,
 			deleteLightbox() {
+				if (activeLightboxes.some((activeId) => activeId === lightboxId)) {
+					return;
+				}
+
 				const lightboxToRemove = lightboxed.get(lightboxId)!;
 				const { onClose } = lightboxToRemove;
 

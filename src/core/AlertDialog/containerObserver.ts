@@ -81,6 +81,10 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 			containerId: id,
 			closeAlertDialog,
 			deleteAlertDialog() {
+				if (activeAlertDialogs.some((activeId) => activeId === alertDialogId)) {
+					return;
+				}
+
 				const alertDialogToRemove = alertDialogs.get(alertDialogId)!;
 				const { onClose } = alertDialogToRemove;
 
