@@ -9,7 +9,8 @@ const defaultProps: IAlertDialogContainerProps = {
 		maxWidth: 'sm',
 		fullScreen: false,
 		confirmCancelText: 'cancel',
-		confirmOkText: 'ok'
+		confirmOkText: 'ok',
+		closeButton: false
 	}
 };
 

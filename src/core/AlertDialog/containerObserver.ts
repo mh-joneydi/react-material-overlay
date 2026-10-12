@@ -3,7 +3,7 @@ import { isNull, omitBy } from 'lodash';
 import type { Id, Notify } from '../../types';
 import enhancedMerge from '../../utils/enhancedMerge';
 import mergeClasses from '../../utils/mergeClasses';
-import { isFn } from '../../utils/propValidator';
+import { canBeRendered, isFn } from '../../utils/propValidator';
 import RmoStack from '../RmoStack';
 
 import { IAlertDialogDefaultOptions, IAlertDialogProps, INotValidatedAlertDialogProps } from './types';
@@ -78,9 +78,15 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 
 		alertDialogCount++;
 
-		const { classes: defaultClasses, ...containerProps } = defaultOptions;
+		const {
+			classes: defaultClasses,
+			closeButton: defaultCloseButton,
+			closeButtonIcon: defaultCloseButtonIcon,
+			layout: defaultLayout,
+			...containerProps
+		} = defaultOptions;
 
-		const { classes, ...alertDialogOptions } = options;
+		const { classes, closeButton, closeButtonIcon, layout, ...alertDialogOptions } = options;
 
 		const alertDialogProps = {
 			...enhancedMerge(containerProps, omitBy(alertDialogOptions, isNull)),
@@ -119,6 +125,24 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 			alertDialogProps.classes = defaultClasses;
 		} else {
 			alertDialogProps.classes = classes;
+		}
+
+		alertDialogProps.closeButton = defaultCloseButton;
+
+		if (closeButton === false || canBeRendered(closeButton)) {
+			alertDialogProps.closeButton = closeButton;
+		} else if (closeButton === true) {
+			alertDialogProps.closeButton = canBeRendered(defaultCloseButton) ? defaultCloseButton : true;
+		}
+
+		alertDialogProps.closeButtonIcon = closeButtonIcon || defaultCloseButtonIcon;
+
+		alertDialogProps.layout = defaultLayout;
+
+		if (canBeRendered(layout)) {
+			alertDialogProps.layout = layout;
+		} else if (layout === true) {
+			alertDialogProps.layout = canBeRendered(defaultLayout) ? defaultLayout : true;
 		}
 
 		return alertDialogProps;

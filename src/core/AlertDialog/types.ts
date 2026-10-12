@@ -7,16 +7,29 @@ import {
 	DialogTitleProps,
 	FadeProps,
 	GrowProps,
+	IconButtonProps,
 	SlideProps,
 	ZoomProps
 } from '@mui/material';
 
+import { ICloseButtonProps } from '../../components/CloseButton';
 import { transitionPreset } from '../../components/getPresetTransitionComponent';
 import { Id } from '../../types';
 
 export interface IActionButtonsProps {
 	defaultButtons: React.ReactNode;
 	closeAlertDialog: IAlertDialogProps['closeAlertDialog'];
+}
+
+export interface IAlertDialogLayoutProps {
+	title?: React.ReactNode;
+	content?: React.ReactNode;
+	actions: React.ReactNode;
+	closeButton: React.ReactNode;
+	closeAlertDialog: () => Promise<boolean>;
+	DialogTitleProps?: Omit<DialogTitleProps, 'children'>;
+	DialogContentProps?: Omit<DialogContentProps, 'children'>;
+	DialogActionsProps?: Omit<DialogActionsProps, 'children'>;
 }
 
 export type IAlertDialogFrequentlyUsedDialogProps = Pick<
@@ -65,6 +78,57 @@ export interface IAlertDialogCommonOptions extends IAlertDialogFrequentlyUsedDia
 	 * By default, actions are ok and cancel
 	 */
 	actionButtons?: ((props: IActionButtonsProps) => React.ReactNode) | React.ReactElement<IActionButtonsProps>;
+	/**
+	 * Pass a custom close button.
+	 * To remove the close button pass `false`.
+	 *
+	 * By default, the close button is hidden. When shown, the closeButton element is [`IconButton`](https://mui.com/material-ui/api/icon-button/).
+	 *
+	 * @default false
+	 */
+	closeButton?: boolean | ((props: ICloseButtonProps) => React.ReactNode) | React.ReactElement<ICloseButtonProps>;
+	/**
+	 * Props applied to the closeButton element.
+	 *
+	 *  @see {@link https://mui.com/material-ui/api/icon-button/#props} for more details.
+	 */
+	closeButtonProps?: IconButtonProps;
+	/**
+	 * Pass a custom icon for closeButton element.
+	 */
+	closeButtonIcon?:
+		| React.ReactNode
+		| ((
+				props: Pick<IAlertDialogCommonOptions, 'transitionPreset' | 'transitionProps' | 'fullScreen'>
+		  ) => React.ReactNode);
+	/**
+	 * Pass a custom layout for the alert dialog regions.
+	 *
+	 * By default, regions render as title, content, actions, then the close button when it is shown.
+	 *
+	 * @example
+	 * ```
+	 * pushAlertDialog({
+	 *   title: 'Title',
+	 *   content: 'Body',
+	 *   closeButton: true,
+	 *   layout: ({ title, content, actions, closeButton, DialogTitleProps, DialogContentProps, DialogActionsProps }) => (
+	 *     <>
+	 *       <DialogTitle {...DialogTitleProps}>{title}</DialogTitle>
+	 *       <DialogContent {...DialogContentProps}>{content}</DialogContent>
+	 *       <DialogActions {...DialogActionsProps}>
+	 *         {actions}
+	 *         {closeButton}
+	 *       </DialogActions>
+	 *     </>
+	 *   )
+	 * })
+	 * ```
+	 */
+	layout?:
+		| boolean
+		| ((props: IAlertDialogLayoutProps) => React.ReactNode)
+		| React.ReactElement<IAlertDialogLayoutProps>;
 	/**
 	 * Adjust the transition with [`preset Transitions`]('https://mui.com/material-ui/transitions/').
 	 *

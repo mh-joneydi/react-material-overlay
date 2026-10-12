@@ -1,11 +1,15 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Button, Dialog } from '@mui/material';
 
-import { IAlertDialogProps } from '../../core/AlertDialog/types';
+import { IAlertDialogLayoutProps, IAlertDialogProps } from '../../core/AlertDialog/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
+import CloseButton, { ICloseButtonProps } from '../CloseButton';
+import CloseButtonIcon from '../CloseButtonIcon';
 import getPresetTransitionComponent from '../getPresetTransitionComponent';
 import SuspenseFallback from '../SuspenseFallback';
+
+import AlertDialogLayout from './AlertDialogLayout';
 
 const AlertDialog = ({
 	title,
@@ -41,7 +45,11 @@ const AlertDialog = ({
 	confirmCancelText,
 	confirmOkText,
 	actionButtons,
-	alertDialogId
+	alertDialogId,
+	closeButton,
+	closeButtonProps,
+	closeButtonIcon,
+	layout
 }: IAlertDialogProps) => {
 	const sequenceNumber = useRmoStackItemIndex(alertDialogId);
 	const PresetTransitionComponent = React.useMemo(
@@ -104,6 +112,47 @@ const AlertDialog = ({
 		}
 	}
 
+	const _closeButtonProps: ICloseButtonProps = {
+		closeButtonProps,
+		closeHandler: closeAlertDialog,
+		icon: isFn(closeButtonIcon)
+			? closeButtonIcon({ transitionPreset, transitionProps, fullScreen })
+			: closeButtonIcon || <CloseButtonIcon />
+	};
+
+	let Close: React.ReactNode = null;
+
+	if (closeButton === false) {
+		// hide
+	} else if (isFn(closeButton)) {
+		Close = closeButton(_closeButtonProps);
+	} else if (React.isValidElement(closeButton)) {
+		Close = React.cloneElement(closeButton, closeButtonProps);
+	} else if (closeButton) {
+		Close = CloseButton(_closeButtonProps);
+	}
+
+	const _layoutProps: IAlertDialogLayoutProps = {
+		title,
+		content,
+		actions: Actions,
+		closeButton: Close,
+		closeAlertDialog,
+		DialogTitleProps,
+		DialogContentProps,
+		DialogActionsProps
+	};
+
+	let Layout: React.ReactNode;
+
+	if (isFn(layout)) {
+		Layout = layout(_layoutProps);
+	} else if (React.isValidElement(layout)) {
+		Layout = React.cloneElement(layout, _layoutProps);
+	} else {
+		Layout = AlertDialogLayout(_layoutProps);
+	}
+
 	return (
 		<Dialog
 			{...(DialogProps ?? {})}
@@ -127,11 +176,7 @@ const AlertDialog = ({
 				zIndex: theme.zIndex.modal + sequenceNumber
 			})}
 		>
-			<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>
-				{title && <DialogTitle {...(DialogTitleProps ?? {})}>{title}</DialogTitle>}
-				{content && <DialogContent {...(DialogContentProps ?? {})}>{content}</DialogContent>}
-				<DialogActions {...(DialogActionsProps ?? {})}>{Actions}</DialogActions>
-			</React.Suspense>
+			<React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{Layout}</React.Suspense>
 		</Dialog>
 	);
 };
