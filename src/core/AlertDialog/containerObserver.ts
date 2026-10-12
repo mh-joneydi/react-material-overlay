@@ -62,11 +62,18 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IAlertD
 
 		const closeAlertDialog = async () => {
 			if (shouldIgnorePop(alertDialogId)) {
-				return;
+				return false;
+			}
+
+			const popped = await RmoStack.pop({ id: alertDialogId, preventEventTriggering: true });
+
+			if (!popped) {
+				return false;
 			}
 
 			popAlertDialog();
-			await RmoStack.pop({ id: alertDialogId, preventEventTriggering: true });
+
+			return true;
 		};
 
 		alertDialogCount++;

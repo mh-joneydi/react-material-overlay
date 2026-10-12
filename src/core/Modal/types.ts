@@ -113,6 +113,12 @@ export interface IModalCommonOptions extends IModalFrequentlyUsedDialogProps {
 	 */
 	closeOnBackdropClick?: boolean;
 	/**
+	 * If `true`, the modal will close when Escape is pressed.
+	 *
+	 * @default true
+	 */
+	closeOnEscape?: boolean;
+	/**
 	 * Props for the Dialog component to more cutomization
 	 *
 	 *  @see {@link https://mui.com/material-ui/api/dialog/#props} for more details.
@@ -232,7 +238,7 @@ export interface IModalProps extends IModalOptions {
 	containerId: Id;
 	show: boolean;
 	children: React.ReactNode;
-	closeModal: () => Promise<void>;
+	closeModal: () => Promise<boolean>;
 	deleteModal: () => void;
 	classes?: DialogProps['classes'];
 }

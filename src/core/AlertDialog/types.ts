@@ -82,11 +82,17 @@ export interface IAlertDialogCommonOptions extends IAlertDialogFrequentlyUsedDia
 	 */
 	transitionProps?: Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>;
 	/**
-	 * If `true`, the modal will close when the backdrop is clicked.
+	 * If `true`, the alert dialog will close when the backdrop is clicked.
 	 *
 	 * @default true
 	 */
 	closeOnBackdropClick?: boolean;
+	/**
+	 * If `true`, the alert dialog will close when Escape is pressed.
+	 *
+	 * @default true
+	 */
+	closeOnEscape?: boolean;
 	/**
 	 * Props for the Dialog component to more cutomization
 	 *
@@ -198,7 +204,7 @@ export interface IAlertDialogProps extends IAlertDialogOptions {
 	alertDialogId: Id;
 	containerId: Id;
 	show: boolean;
-	closeAlertDialog: () => Promise<void>;
+	closeAlertDialog: () => Promise<boolean>;
 	deleteAlertDialog: () => void;
 	classes?: DialogProps['classes'];
 }

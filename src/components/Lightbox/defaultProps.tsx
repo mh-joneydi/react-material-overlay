@@ -11,7 +11,8 @@ const defaultProps: ILightboxContainerProps = {
 		fullscreen: true,
 		noScrollOptions: { disabled: false },
 		captions: true,
-		thumbnails: true
+		thumbnails: true,
+		closeOnEscape: true
 	}
 };
 

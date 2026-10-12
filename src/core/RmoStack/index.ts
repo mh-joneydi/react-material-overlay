@@ -1,7 +1,8 @@
 import { Mutex } from 'async-mutex';
 
-import { Id } from '../../types';
-import { isId, isNum } from '../../utils/propValidator';
+import { Id, PopInterceptor } from '../../types';
+import { readPopInterceptor } from '../../utils/allowsClose';
+import { isFn, isId, isNum } from '../../utils/propValidator';
 
 import { genRmoStackId } from './genRmoStackId';
 
@@ -17,11 +18,15 @@ interface RmoHistoryState {
 }
 
 const listeners = new Map<Id, StackCallbacks>();
+const popInterceptors = new Map<Id, Set<PopInterceptor>>();
+const confirming = new Set<Id>();
 const stack: Id[] = [];
 const mutex = new Mutex();
 const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
 let historyTraversal = false;
+let restoringHistory = false;
+let resolveHistoryRestore: (() => void) | null = null;
 
 export interface PushOptions {
 	/**
@@ -108,6 +113,24 @@ function readHistoryIds(state: unknown): Id[] {
 }
 
 /**
+ * Ids that would leave the stack if history landed on `state`, top first.
+ * @private
+ */
+function closingIdsFromState(state: unknown): Id[] {
+	const desiredIds = readHistoryIds(state);
+
+	return stack.filter((id) => !desiredIds.includes(id)).reverse();
+}
+
+function guardsFor(id: Id): PopInterceptor[] {
+	return [...(popInterceptors.get(id) ?? [])];
+}
+
+function hasPopInterceptor(id: Id): boolean {
+	return guardsFor(id).length > 0;
+}
+
+/**
  * Aligns the in-memory stack with the ids on the destination history entry.
  * Callbacks for closed ids stay registered so a later forward can redo them.
  * @private
@@ -173,38 +196,112 @@ function markHistoryTraversal(): void {
 }
 
 /**
- * Pops multiple items from the stack.
- * @param {number} count - The number of items to pop from the stack.
- * @param {boolean} [preventEventTriggering=false] - If true, prevents triggering events for each item.
+ * Moves forward to the history entry this back navigation left.
+ * The following `popstate` is ignored so the in-memory stack stays put.
  * @private
  */
-async function popMultiple(count: number, preventEventTriggering = false): Promise<void> {
-	const items = stack.splice(-Math.abs(count));
+function beginHistoryRestore(steps: number): Promise<void> {
+	restoringHistory = true;
 
-	if (items.length === 0) {
-		return;
-	}
+	const restored = new Promise<void>((resolve) => {
+		resolveHistoryRestore = resolve;
+	});
 
-	items.forEach((id) => triggerListener(id, preventEventTriggering));
-	await popHistoryState(items.length);
+	window.history.go(steps);
+
+	return restored;
+}
+
+function finishHistoryRestore(): void {
+	restoringHistory = false;
+	resolveHistoryRestore?.();
+	resolveHistoryRestore = null;
 }
 
 /**
- * Pops a single item from the stack based on the provided options.
- * @param {SinglePopOptions} [options] - Options to specify which item to pop and whether to trigger events.
+ * Runs every guard for one id. A second request while one is in progress does not open another dialog.
  * @private
  */
-async function popSingle(options?: SinglePopOptions): Promise<void> {
-	const lastItemId = stack.at(-1);
-
-	if (!lastItemId || (options?.id && options.id !== lastItemId)) {
-		return;
+async function confirmClose(id: Id): Promise<boolean> {
+	if (confirming.has(id)) {
+		return false;
 	}
 
-	stack.pop();
+	const guards = guardsFor(id);
 
-	triggerListener(lastItemId, options?.preventEventTriggering);
-	await popHistoryState();
+	if (guards.length === 0) {
+		return true;
+	}
+
+	confirming.add(id);
+
+	try {
+		for (const guard of guards) {
+			if (!(await readPopInterceptor(guard))) {
+				return false;
+			}
+		}
+
+		return true;
+	} finally {
+		confirming.delete(id);
+	}
+}
+
+/**
+ * How many ids from the top may close. Stops at the first denial, leaving the rest open.
+ * @private
+ */
+async function countAllowed(ids: Id[]): Promise<number> {
+	let allowed = 0;
+
+	for (const id of ids) {
+		if (!(await confirmClose(id))) {
+			break;
+		}
+
+		allowed += 1;
+	}
+
+	return allowed;
+}
+
+/**
+ * Pops the given ids only if they are still the top of the stack, in that order.
+ * @private
+ */
+async function commitPopIds(idsFromTop: Id[], preventEventTriggering = false): Promise<boolean> {
+	if (idsFromTop.length === 0) {
+		return false;
+	}
+
+	return mutex.runExclusive(async () => {
+		const top = stack.slice(-idsFromTop.length).reverse();
+		const matches = top.length === idsFromTop.length && top.every((id, index) => id === idsFromTop[index]);
+
+		if (!matches) {
+			return false;
+		}
+
+		const items = stack.splice(-idsFromTop.length);
+
+		items.forEach((id) => triggerListener(id, preventEventTriggering));
+		await popHistoryState(items.length);
+
+		return true;
+	});
+}
+
+async function popAllowed(idsFromTop: Id[], preventEventTriggering = false): Promise<boolean> {
+	const allowed = await countAllowed(idsFromTop);
+
+	if (allowed === 0) {
+		return false;
+	}
+
+	const popped = await commitPopIds(idsFromTop.slice(0, allowed), preventEventTriggering);
+
+	return popped && allowed === idsFromTop.length;
 }
 
 /**
@@ -256,6 +353,13 @@ async function popHistoryState(count = 1): Promise<void> {
 	});
 }
 
+function applyHistoryPop(state: unknown): void {
+	void mutex.runExclusive(() => {
+		syncStackWithHistory(state);
+		alignHistoryEntryWithStack();
+	});
+}
+
 /**
  * Initializes the stack based on the current browser history state and sets up event listeners.
  * @private
@@ -270,9 +374,27 @@ function initialize(): void {
 			return;
 		}
 
-		mutex.runExclusive(() => {
-			syncStackWithHistory(e.state);
-			alignHistoryEntryWithStack();
+		if (restoringHistory) {
+			finishHistoryRestore();
+
+			return;
+		}
+
+		const closingIds = closingIdsFromState(e.state);
+		const guarded = closingIds.some((id) => hasPopInterceptor(id));
+
+		if (!guarded) {
+			applyHistoryPop(e.state);
+
+			return;
+		}
+
+		void beginHistoryRestore(closingIds.length).then(async () => {
+			const allowed = await countAllowed(closingIds);
+
+			if (allowed > 0) {
+				await commitPopIds(closingIds.slice(0, allowed), false);
+			}
 		});
 	});
 
@@ -321,52 +443,90 @@ const RmoStack = {
 		});
 	},
 
-	pop: ((params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<void> => {
-		return mutex.runExclusive(async () => {
-			if (isNum(params)) {
-				if (params < 2) {
-					console.warn('for multiple pops, count must be at least 2, otherwise use pop without count parameter.');
-				}
+	/**
+	 * Registers a pop interceptor. Every interceptor must allow the pop.
+	 * The returned function removes this interceptor only.
+	 */
+	subscribePopInterceptor(id: Id, interceptor: PopInterceptor): () => void {
+		if (!isFn(interceptor)) {
+			return () => undefined;
+		}
 
-				// Pop multiple items
-				await popMultiple(params, preventEventTriggering);
-			} else {
-				// Pop a single item
-				await popSingle(params);
+		let interceptors = popInterceptors.get(id);
+
+		if (!interceptors) {
+			interceptors = new Set();
+			popInterceptors.set(id, interceptors);
+		}
+
+		interceptors.add(interceptor);
+
+		return () => {
+			const current = popInterceptors.get(id);
+
+			current?.delete(interceptor);
+
+			if (current && current.size === 0) {
+				popInterceptors.delete(id);
 			}
-		});
+		};
+	},
+
+	pop: ((params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<boolean> => {
+		if (isNum(params)) {
+			if (params < 2) {
+				console.warn('for multiple pops, count must be at least 2, otherwise use pop without count parameter.');
+			}
+
+			const count = Math.min(Math.abs(params), stack.length);
+			const idsFromTop = stack.slice(-count).reverse();
+
+			return popAllowed(idsFromTop, preventEventTriggering);
+		}
+
+		const options = params;
+		const lastItemId = stack.at(-1);
+
+		if (!lastItemId || (options?.id && options.id !== lastItemId)) {
+			return Promise.resolve(false);
+		}
+
+		return popAllowed([lastItemId], options?.preventEventTriggering);
 	}) as {
 		/**
 		 * Pops item from the stack.
 		 * @param {SinglePopOptions} [params] - options for pop.
-		 * @returns {Promise<void>} - A promise that resolves when the pop operation is complete.
+		 * @returns {Promise<boolean>} - Resolves `true` when the item was popped.
 		 */
-		(params?: SinglePopOptions): Promise<void>;
+		(params?: SinglePopOptions): Promise<boolean>;
 		/**
 		 * Pops items from the stack.
 		 * @param {number} [count] - The number of items to pop.
 		 * @param {boolean} [preventEventTriggering] - If true, prevents triggering the associated events.
-		 * @returns {Promise<void>} - A promise that resolves when the pop operation is complete.
+		 * @returns {Promise<boolean>} - Resolves `true` when every requested item was popped.
 		 */
-		(count?: number, preventEventTriggering?: boolean): Promise<void>;
+		(count?: number, preventEventTriggering?: boolean): Promise<boolean>;
 	},
 
 	/**
-	 * Flushes all items from the stack, optionally triggering events for each item.
+	 * Flushes items from the top of the stack until a pop interceptor denies one.
 	 * @param {boolean} [preventEventTriggering=false] - If `true`, prevents triggering events for each flushed item.
-	 * @returns {Promise<void>} - A promise that resolves when all items are flushed.
+	 * @returns {Promise<void>} - A promise that resolves when the flush attempt is finished.
 	 */
 	async flush(preventEventTriggering = false): Promise<void> {
-		return mutex.runExclusive(async () => {
-			const items = stack.splice(0);
+		const idsFromTop = [...stack].reverse();
 
-			if (items.length === 0) {
-				return;
-			}
+		if (idsFromTop.length === 0) {
+			return;
+		}
 
-			items.forEach((id) => triggerListener(id, preventEventTriggering));
-			await popHistoryState(items.length);
-		});
+		const allowed = await countAllowed(idsFromTop);
+
+		if (allowed === 0) {
+			return;
+		}
+
+		await commitPopIds(idsFromTop.slice(0, allowed), preventEventTriggering);
 	},
 
 	/**

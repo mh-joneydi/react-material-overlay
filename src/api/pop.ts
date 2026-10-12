@@ -9,7 +9,9 @@ interface PopParams {
 }
 
 /**
- * Remove(close) overlays programmatically
+ * Remove(close) overlays programmatically.
+ * A pop interceptor registered with `registerPopInterceptor` or `usePopInterceptor` can keep the overlay open.
+ * Resolves `true` when the requested pop happened.
  *
  * - Remove the last active overlay:
  * ```

@@ -132,6 +132,12 @@ export interface ILightboxCommonOptions {
 	 * add extra plugins
 	 */
 	extraPlugins?: LightboxProps['plugins'];
+	/**
+	 * If `true`, the lightbox will close when Escape is pressed.
+	 *
+	 * @default true
+	 */
+	closeOnEscape?: boolean;
 }
 
 export interface ILightboxDefaultOptions extends ILightboxCommonOptions {
@@ -195,7 +201,7 @@ export interface ILightboxProps extends ILightboxOptions {
 	lightboxId: Id;
 	containerId: Id;
 	show: boolean;
-	closeLightbox: () => Promise<void>;
+	closeLightbox: () => Promise<boolean>;
 	deleteLightbox: () => void;
 	className?: LightboxProps['className'];
 }

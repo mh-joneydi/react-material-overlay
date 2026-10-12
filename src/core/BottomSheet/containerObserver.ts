@@ -70,11 +70,18 @@ export function createContainerObserver(id: Id, containerDefaultOptions: IBottom
 
 		const closeBottomSheet = async () => {
 			if (shouldIgnorePop(bottomSheetId)) {
-				return;
+				return false;
+			}
+
+			const popped = await RmoStack.pop({ id: bottomSheetId, preventEventTriggering: true });
+
+			if (!popped) {
+				return false;
 			}
 
 			popBottomSheet();
-			await RmoStack.pop({ id: bottomSheetId, preventEventTriggering: true });
+
+			return true;
 		};
 
 		bottomSheetCount++;

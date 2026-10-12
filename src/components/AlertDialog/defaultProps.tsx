@@ -4,6 +4,7 @@ const defaultProps: IAlertDialogContainerProps = {
 	defaultOptions: {
 		scroll: 'paper',
 		closeOnBackdropClick: true,
+		closeOnEscape: true,
 		fullWidth: false,
 		maxWidth: 'sm',
 		fullScreen: false,

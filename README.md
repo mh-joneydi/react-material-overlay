@@ -444,6 +444,7 @@ flush().then(() => {
 | `transitionPreset`      | `'zoom' \| 'fade' \| 'grow' \| 'slide' \| 'collapse'` (optional)                                                                                 | `'fade'`  | Adjusts the transition using preset transitions. For more customization, use `TransitionComponent`.                                                  |
 | `transitionProps`       | `Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>` (optional)                                                    | —         | Props applied to the transition element. Applies to both the transition preset and `TransitionComponent`.                                            |
 | `closeOnBackdropClick`  | `boolean` (optional)                                                                                                                             | `true`    | If `true`, the modal closes when the backdrop is clicked.                                                                                            |
+| `closeOnEscape`         | `boolean` (optional)                                                                                                                             | `true`    | If `true`, the modal closes when Escape is pressed.                                                                                                  |
 | `DialogProps`           | `DialogProps` (optional)                                                                                                                         | —         | Props for the Dialog component for further customization. Refer to the [Dialog props](https://mui.com/material-ui/api/dialog/#props) for details.    |
 | `header`                | `boolean \| ((params: IModalHeaderProps) => React.ReactNode) \| React.ReactElement<IModalHeaderProps>` (optional)                                | `true`    | Custom header for the modal. Defaults to `CardHeader`.                                                                                               |
 | `headerProps`           | `CardHeaderProps` (optional)                                                                                                                     | —         | Props for the header component. Refer to the [CardHeader props](https://mui.com/material-ui/api/card-header/#props) for more details.                |
@@ -500,7 +501,7 @@ const modalId = await pushModal('content');
 | `confirmCancelButtonProps` | `ButtonProps` (optional)                                                                                    | -          | Props for the cancel button for further customization.                                                           |
 | `actionButtons`            | `((props: IActionButtonsProps) => React.ReactNode) \| React.ReactElement<IActionButtonsProps>` (optional)   | -          | Pass custom Dialog Actions. By default, actions are OK and cancel.                                               |
 | `onOpen`                   | `() => void` (optional)                                                                                     | -          | Called when the modal is mounted.                                                                                |
-| `onClose`                  | `() => void` (optional)                                                                                     | -          | Called when the modal is unmounted.                                                                              |
+| `onClose`                  | `() => void` (optional)                                                                                     | -          | Called when the alert dialog is unmounted.                                                                       |
 | `DialogTitleProps`         | `DialogTitleProps` (optional)                                                                               | -          | Props for the DialogTitle component.                                                                             |
 | `DialogContentProps`       | `DialogContentProps>` (optional)                                                                            | -          | Props for the DialogContent component.                                                                           |
 | `DialogActionsProps`       | `DialogActionsProps>` (optional)                                                                            | -          | Props for the DialogActions component.                                                                           |
@@ -519,7 +520,8 @@ const modalId = await pushModal('content');
 | `transitionDuration`       | `DialogProps['transitionDuration']` (optional)                                                              | —          | The duration for the transition, in milliseconds.                                                                |
 | `transitionPreset`         | `'zoom' \| 'fade' \| 'grow' \| 'slide' \| 'collapse'` (optional)                                            | `'fade'`   | Adjust the transition with preset Transitions. If you want more customization, use `TransitionComponent` prop.   |
 | `transitionProps`          | `Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>` (optional)               | -          | Props applied to the transition element.                                                                         |
-| `closeOnBackdropClick`     | `boolean` (optional)                                                                                        | `true`     | If `true`, the modal will close when the backdrop is clicked.                                                    |
+| `closeOnBackdropClick`     | `boolean` (optional)                                                                                        | `true`     | If `true`, the alert dialog closes when the backdrop is clicked.                                                 |
+| `closeOnEscape`            | `boolean` (optional)                                                                                        | `true`     | If `true`, the alert dialog closes when Escape is pressed.                                                       |
 | `DialogProps`              | `DialogProps` (optional)                                                                                    | -          | Props for the Dialog component for further customization.                                                        |
 
 #### `AlertDialogContainer` props
@@ -589,6 +591,7 @@ const alertDialogId = await pushAlertDialog({ title: 'Dialog Title', content: 'D
 | `extraPlugins`      | `LightboxProps['plugins']` (optional)                                                                                     | -                  | Add extra plugins to enhance the lightbox's functionality.                                                                                                                   |
 | `onOpen`            | `() => void` (optional)                                                                                                   | -                  | Callback function called when the lightbox is mounted.                                                                                                                       |
 | `onClose`           | `() => void` (optional)                                                                                                   | -                  | Callback function called when the lightbox is unmounted.                                                                                                                     |
+| `closeOnEscape`     | `boolean` (optional)                                                                                                      | `true`             | If `true`, the lightbox closes when Escape is pressed.                                                                                                                       |
 | `className`         | `((defaultClassName: LightboxProps['className']) => LightboxProps['className']) \| LightboxProps['className']` (optional) | -                  | Override or extend the styles applied to the component. This can auto merge with the default className or manually overwrite the default className defined in the Container. |
 
 #### `LightboxContainer` props
@@ -635,6 +638,8 @@ const lightboxId = await pushLightbox({ slides: [...] });
 | `closeButtonIcon`       | `React.ReactNode` (optional)                                                                                                                  | —                                                                   | Custom icon for the close button.                                                                                                                                                                                        |
 | `onOpen`                | `() => void` (optional)                                                                                                                       | -                                                                   | Callback function called when the bottom sheet is mounted.                                                                                                                                                               |
 | `onClose`               | `() => void` (optional)                                                                                                                       | -                                                                   | Callback function called when the bottom sheet is unmounted.                                                                                                                                                             |
+| `closeOnBackdropClick`  | `boolean` (optional)                                                                                                                          | `true`                                                              | If `true`, the bottom sheet closes when its backdrop is clicked. The sheet uses an MUI `Backdrop` instead of the built-in bottom sheet backdrop.                                                                         |
+| `closeOnEscape`         | `boolean` (optional)                                                                                                                          | `true`                                                              | If `true`, the bottom sheet closes when Escape is pressed.                                                                                                                                                               |
 | `className`             | `BottomSheetProps['className']` (optional)                                                                                                    | -                                                                   | CSS class for the BottomSheet root element. Merges with the default className defined in Container or can overwrite it manually.                                                                                         |
 | `sibling`               | `boolean \| React.ReactNode \| ((props: BottomSheetSiblingProps) => React.ReactNode)` (optional)                                              | -                                                                   | Similar to `children`, renders next to the overlay element rather than inside it. Useful for position: fixed elements that need to overlay the backdrop while remaining interactive in blocking mode.                    |
 | `footer`                | `boolean \| React.ReactNode \| ((props: BottomSheetFooterProps) => React.ReactNode)` (optional)                                               | -                                                                   | Renders a sticky footer at the bottom of the sheet.                                                                                                                                                                      |
@@ -694,7 +699,7 @@ const bottomSheetId = await pushBottomSheet('content');
 
 #### `pop`
 
-Closes the last active overlay or a specified number of active overlays programmatically. This allows for dynamic management of overlays within the application.
+Closes the last active overlay or a specified number of active overlays programmatically. A pop interceptor registered for that stack id can keep the overlay open. Resolves `true` when every requested overlay was closed.
 
 ##### Example
 
@@ -726,7 +731,7 @@ Closes the last active overlay or a specified number of active overlays programm
 
 #### `flush`
 
-Closes all active overlays at once. This function is useful for resetting the overlay stack, ensuring that no overlays remain visible.
+Closes active overlays from the top of the stack until a pop interceptor registered for that stack id denies one. Overlays below a denial stay open.
 
 ##### Example
 
@@ -734,6 +739,39 @@ Closes all active overlays at once. This function is useful for resetting the ov
 import { flush } from 'react-material-overlay';
 
 await flush();
+```
+
+#### `registerPopInterceptor`
+
+Registers a pop interceptor for a stack id. The id is the same one passed to `pushModal`, `pushAlertDialog`, `pushBottomSheet`, or `pushLightbox`. Return `false`, or a promise that resolves to `false`, to cancel that pop. The returned function removes this interceptor only. Every registered interceptor must allow the pop. This covers the close button, backdrop, Escape, `pop()`, `flush()`, and the browser Back button.
+
+```typescript
+import { pushModal, registerPopInterceptor } from 'react-material-overlay';
+
+await pushModal(<Form />, { modalId: 'edit-user' });
+
+const unsubscribe = registerPopInterceptor('edit-user', async () => {
+	return window.confirm('Discard changes?');
+});
+```
+
+#### `usePopInterceptor`
+
+Registers the same interceptor while a component is mounted, and removes it on unmount. Pass the stack id the developer gave to `push*`.
+
+```tsx
+import { useState } from 'react';
+import { usePopInterceptor } from 'react-material-overlay';
+
+function Form() {
+	const [isDirty] = useState(false);
+
+	usePopInterceptor('edit-user', async () => {
+		if (!isDirty) return true;
+
+		return window.confirm('Discard changes?');
+	});
+}
 ```
 
 ---
@@ -775,9 +813,9 @@ Pushes a new item onto the stack, sets an event listener, and updates the histor
     - `id`: The identifier of the pushed item.
     - `index`: The index of the pushed item in the stack.
 
-##### `pop(params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<void>`
+##### `pop(params?: number | SinglePopOptions, preventEventTriggering?: boolean): Promise<boolean>`
 
-Pops items from the stack.
+Pops items from the stack. A pop interceptor registered for that stack id can stop the pop. Items below a denial stay on the stack.
 
 - **Parameters**
 
@@ -787,11 +825,11 @@ Pops items from the stack.
   - `preventEventTriggering`: (optional) A boolean to prevent triggering events for each popped item.
 
 - **Returns**
-  - A promise that resolves when the pop operation is complete.
+  - A promise that resolves `true` when every requested item was popped.
 
 ##### `flush(preventEventTriggering: boolean = false): Promise<void>`
 
-Flushes all items from the stack, optionally triggering events for each item.
+Flushes items from the top of the stack until a pop interceptor registered for that stack id denies one.
 
 - **Parameters**
 

@@ -23,6 +23,7 @@ const AlertDialog = ({
 	fullWidth,
 	transitionPreset,
 	closeOnBackdropClick,
+	closeOnEscape,
 	PaperComponent,
 	PaperProps,
 	DialogProps,
@@ -53,12 +54,19 @@ const AlertDialog = ({
 			return;
 		}
 
+		if (closeOnEscape === false && reason && reason === 'escapeKeyDown') {
+			return;
+		}
+
 		closeAlertDialog();
 	}
 
 	const withCloseAlertDialog = (callBack: () => void) => async () => {
-		await closeAlertDialog();
-		callBack();
+		const closed = await closeAlertDialog();
+
+		if (closed) {
+			callBack();
+		}
 	};
 
 	const defaultActionButtons = (

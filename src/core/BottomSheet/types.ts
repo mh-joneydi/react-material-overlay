@@ -34,38 +34,40 @@ export type BottomSheetSiblingProps = IBottomSheetCustomRenderProps;
 
 export type BottomSheetRef = RSBSBottomSheetRef;
 
-export interface IBottomSheetHeaderProps extends Pick<
-	IBottomSheetProps,
-	| 'closeBottomSheet'
-	| 'bottomSheetId'
-	| 'defaultSnap'
-	| 'expandOnContentDrag'
-	| 'containerId'
-	| 'maxHeight'
-	| 'snapPoints'
-	| 'title'
-	| 'subheader'
-	| 'headerProps'
-	| 'scrollLocking'
-	| 'reserveScrollBarGap'
-	| 'blocking'
-> {
+export interface IBottomSheetHeaderProps
+	extends Pick<
+		IBottomSheetProps,
+		| 'closeBottomSheet'
+		| 'bottomSheetId'
+		| 'defaultSnap'
+		| 'expandOnContentDrag'
+		| 'containerId'
+		| 'maxHeight'
+		| 'snapPoints'
+		| 'title'
+		| 'subheader'
+		| 'headerProps'
+		| 'scrollLocking'
+		| 'reserveScrollBarGap'
+		| 'blocking'
+	> {
 	closeButton?: React.ReactNode;
 }
-export interface IBottomSheetContentWrapperProps extends Pick<
-	IBottomSheetProps,
-	| 'closeBottomSheet'
-	| 'bottomSheetId'
-	| 'contentWrapperProps'
-	| 'defaultSnap'
-	| 'expandOnContentDrag'
-	| 'containerId'
-	| 'maxHeight'
-	| 'snapPoints'
-	| 'scrollLocking'
-	| 'reserveScrollBarGap'
-	| 'blocking'
-> {
+export interface IBottomSheetContentWrapperProps
+	extends Pick<
+		IBottomSheetProps,
+		| 'closeBottomSheet'
+		| 'bottomSheetId'
+		| 'contentWrapperProps'
+		| 'defaultSnap'
+		| 'expandOnContentDrag'
+		| 'containerId'
+		| 'maxHeight'
+		| 'snapPoints'
+		| 'scrollLocking'
+		| 'reserveScrollBarGap'
+		| 'blocking'
+	> {
 	children: React.ReactNode;
 }
 
@@ -87,6 +89,18 @@ export interface IBottomSheetCommonOptions extends RSBSProps {
 	 * Pass a custom icon for closeButton element.
 	 */
 	closeButtonIcon?: React.ReactNode;
+	/**
+	 * If `true`, the bottom sheet will close when the backdrop is clicked.
+	 *
+	 * @default true
+	 */
+	closeOnBackdropClick?: boolean;
+	/**
+	 * If `true`, the bottom sheet will close when Escape is pressed.
+	 *
+	 * @default true
+	 */
+	closeOnEscape?: boolean;
 	/**
 	 * Similar to children, but renders next to the overlay element rather than inside it.
 	 * Useful for things that are position:fixed and need to overlay the backdrop and still be interactive
@@ -236,7 +250,7 @@ export interface IBottomSheetProps extends IBottomSheetOptions {
 	containerId: Id;
 	show: boolean;
 	children: React.ReactNode;
-	closeBottomSheet: () => Promise<void>;
+	closeBottomSheet: () => Promise<boolean>;
 	deleteBottomSheet: () => void;
 	reactSuspenseFallback?: React.ReactNode;
 	className?: BottomSheetProps['className'];

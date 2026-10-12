@@ -1,6 +1,6 @@
 import React from 'react';
 import { BottomSheet as RSBottomSheet } from 'react-spring-bottom-sheet';
-import { GlobalStyles } from '@mui/material';
+import { Backdrop, GlobalStyles, Portal } from '@mui/material';
 
 import {
 	BottomSheetRef,
@@ -13,6 +13,7 @@ import { isFn } from '../../utils';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
 import CloseButtonIcon from '../CloseButtonIcon';
 import SuspenseFallback from '../SuspenseFallback';
+import useBlockEscapeKey from '../useBlockEscapeKey';
 
 import BottomSheetContentWrapper from './BottomSheetContentWrapper';
 import BottomSheetDefaultHeader from './BottomSheetDefaultHeader';
@@ -52,12 +53,16 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		subheader,
 		title,
 		contentWrapperProps,
-		contentWrapper
+		contentWrapper,
+		closeOnBackdropClick,
+		closeOnEscape
 	},
 	ref
 ) {
 	const sequenceNumber = useRmoStackItemIndex(bottomSheetId);
 	const rsbsId = `rsbs-${containerId}-${bottomSheetId}`;
+
+	useBlockEscapeKey(bottomSheetId, show, closeOnEscape === false ? undefined : closeBottomSheet);
 
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
@@ -142,11 +147,34 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 					[`#${rsbsId} [data-rsbs-overlay], #${rsbsId} [data-rsbs-backdrop], #${rsbsId}[data-rsbs-root]:after`]: {
 						zIndex: theme.zIndex.modal + sequenceNumber
 					},
+					[`#${rsbsId} [data-rsbs-backdrop]`]: {
+						display: 'none'
+					},
 					...(!!sx && {
 						[`#${rsbsId}`]: theme.unstable_sx(sx)
 					})
 				})}
 			/>
+
+			{blocking !== false && (
+				<Portal>
+					<Backdrop
+						open={show}
+						slotProps={{
+							root: {
+								onClick: () => {
+									if (closeOnBackdropClick !== false) {
+										closeBottomSheet();
+									}
+								},
+								sx: (theme) => ({
+									zIndex: theme.zIndex.modal + sequenceNumber
+								})
+							}
+						}}
+					/>
+				</Portal>
+			)}
 
 			<RSBottomSheet
 				{...BottomSheetProps}

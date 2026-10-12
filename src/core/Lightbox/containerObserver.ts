@@ -61,11 +61,18 @@ export function createContainerObserver(id: Id, containerDefaultOptions: ILightb
 
 		const closeLightbox = async () => {
 			if (shouldIgnorePop(lightboxId)) {
-				return;
+				return false;
+			}
+
+			const popped = await RmoStack.pop({ id: lightboxId, preventEventTriggering: true });
+
+			if (!popped) {
+				return false;
 			}
 
 			popLightbox();
-			await RmoStack.pop({ id: lightboxId, preventEventTriggering: true });
+
+			return true;
 		};
 
 		lightboxCount++;

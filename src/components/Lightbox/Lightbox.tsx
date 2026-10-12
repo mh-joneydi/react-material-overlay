@@ -19,6 +19,7 @@ import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import { ILightboxProps } from '../../core/Lightbox/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
+import useBlockEscapeKey from '../useBlockEscapeKey';
 
 import YarlStylesEmotionCacheProvider from './YarlStylesEmotionCacheProvider';
 
@@ -55,9 +56,12 @@ const Lightbox = ({
 	on,
 	slides,
 	extraPlugins,
-	lightboxId
+	lightboxId,
+	closeOnEscape
 }: ILightboxProps) => {
 	const sequenceNumber = useRmoStackItemIndex(lightboxId);
+
+	useBlockEscapeKey(lightboxId, closeOnEscape === false && show);
 
 	const theme = useTheme();
 	const plugins = React.useMemo(

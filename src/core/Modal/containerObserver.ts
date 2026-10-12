@@ -69,11 +69,18 @@ export function createContainerObserver(containerId: Id, containerDefaultOptions
 
 		const closeModal = async () => {
 			if (shouldIgnorePop(modalId)) {
-				return;
+				return false;
+			}
+
+			const popped = await RmoStack.pop({ id: modalId, preventEventTriggering: true });
+
+			if (!popped) {
+				return false;
 			}
 
 			popModal();
-			await RmoStack.pop({ id: modalId, preventEventTriggering: true });
+
+			return true;
 		};
 
 		modalCount++;

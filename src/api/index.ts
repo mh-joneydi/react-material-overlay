@@ -4,3 +4,4 @@ export { default as pushAlertDialog } from './pushAlertDialog';
 export { default as pushBottomSheet } from './pushBottomSheet';
 export { default as pushLightbox } from './pushLightbox';
 export { default as pushModal } from './pushModal';
+export { default as registerPopInterceptor } from './registerPopInterceptor';

@@ -28,6 +28,7 @@ const Modal = ({
 	contentWrapperProps,
 	transitionPreset,
 	closeOnBackdropClick,
+	closeOnEscape,
 	PaperComponent,
 	PaperProps,
 	DialogProps,
@@ -55,6 +56,10 @@ const Modal = ({
 
 	function onClose(_?: unknown, reason?: string) {
 		if (closeOnBackdropClick === false && reason && reason === 'backdropClick') {
+			return;
+		}
+
+		if (closeOnEscape === false && reason && reason === 'escapeKeyDown') {
 			return;
 		}
 
