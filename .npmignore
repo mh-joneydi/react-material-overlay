@@ -4,3 +4,6 @@ eslint.config.js
 .gitignore
 .prettierignore
 .prettierrc
+
+/.idea
+/.vscode

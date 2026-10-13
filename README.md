@@ -1,6 +1,6 @@
 # react-material-overlay
 
-Performant, easy to use, customizable and extendable library provides a generic and flexible way to implement and use overlays (like modals, dialogs, lightboxes, and bottom sheets) in your React applications using [Material UI <sup>V6</sup>](https://mui.com). It supports stacking overlays and integrates seamlessly with the browser's history, enabling users to navigate overlays using the browser’s back button.
+Performant, easy to use, customizable and extendable library provides a generic and flexible way to implement and use overlays (like modals, dialogs, lightboxes, and bottom sheets) in your React applications using [Material UI <sup>V7</sup>](https://mui.com). It supports stacking overlays and integrates seamlessly with the browser's history, enabling users to close overlays with the browser’s back button and restore them with the forward button.
 
 ## Overview
 
@@ -9,7 +9,7 @@ Performant, easy to use, customizable and extendable library provides a generic 
 - **Multiple Overlay Management**: Manage multiple overlays at the same time with an easy-to-use stack mechanism.
 - **Multiple containers support**: Different containers can be set up with unique options for various overlay types.
 - **Overlay Stacking**: Overlays are managed on a stack, ensuring the correct order of opening and closing.
-- **Browser History Integration**: Works seamlessly with browser history, allowing users to navigate back through overlays using the browser's back button.
+- **Browser History Integration**: Works seamlessly with browser history. The back button closes overlays, and the forward button restores them.
 - **Modular API**: Provides individual APIs for pushing different types of overlays: modals, lightboxes, bottom sheets, and alert dialogs.
 - **Custom Overlay Support**: you can add custom overlays and manage them using the `RmoStack` API.
 - **Dynamic Options**: Specify different options for each overlay instance to customize behavior and appearance.
@@ -301,12 +301,12 @@ const App = () => {
 
 Add fields to an overlay by augmenting its common options interface. Those fields are accepted by the matching `push*` call and by the container `defaultOptions`, and they are passed into the overlay render callbacks instead of a fixed subset of props.
 
-| Overlay | Augment | Available in |
-| --- | --- | --- |
-| Alert dialog | `IAlertDialogCommonOptions` | `layout`, `actionButtons`, `closeButtonIcon` |
-| Modal | `IModalCommonOptions` | `header`, `contentWrapper`, `closeButtonIcon`, and the content render props (`modalProps`) |
+| Overlay      | Augment                     | Available in                                                                                       |
+| ------------ | --------------------------- | -------------------------------------------------------------------------------------------------- |
+| Alert dialog | `IAlertDialogCommonOptions` | `layout`, `actionButtons`, `closeButtonIcon`                                                       |
+| Modal        | `IModalCommonOptions`       | `header`, `contentWrapper`, `closeButtonIcon`, and the content render props (`modalProps`)         |
 | Bottom sheet | `IBottomSheetCommonOptions` | `header`, `contentWrapper`, `footer`, `sibling`, and the content render props (`bottomSheetProps`) |
-| Lightbox | `ILightboxCommonOptions` | the lightbox props passed to `pushLightbox` |
+| Lightbox     | `ILightboxCommonOptions`    | the lightbox props passed to `pushLightbox`                                                        |
 
 ```tsx
 declare module 'react-material-overlay' {
@@ -357,6 +357,10 @@ const App = () => {
 						// triggers when users using the browser’s back button or generally happen on stack pop and this item is last in stack.
 						onPopState() {
 							setOpenDrawer(false);
+						},
+						// Restores the overlay when the browser moves forward. Do not push a new history entry here.
+						onRedoState() {
+							setOpenDrawer(true);
 						}
 					}).then(() => setOpenDrawer(true));
 				}}
@@ -476,7 +480,7 @@ flush().then(() => {
 | `transitionDuration`    | `DialogProps['transitionDuration']` (optional)                                                                                                   | —         | Duration for the transition, in milliseconds. Can be a single value or an object.                                                                    |
 | `closeButton`           | `boolean \| ((props: ICloseButtonProps) => React.ReactNode) \| React.ReactElement<ICloseButtonProps>` (optional)                                 | `true`    | Custom close button. Pass `false` to remove it. Defaults to `IconButton`.                                                                            |
 | `closeButtonProps`      | `IconButtonProps` (optional)                                                                                                                     | —         | Props applied to the close button element. Refer to the [IconButton props](https://mui.com/material-ui/api/icon-button/#props) for more details.     |
-| `closeButtonIcon`       | `React.ReactNode \| ((props: Pick<IModalCommonOptions, 'transitionPreset' \| 'transitionProps' \| 'fullScreen'>) => React.ReactNode)` (optional) | —         | Custom icon for the close button.                                                                                                                    |
+| `closeButtonIcon`       | `React.ReactNode \| ((props: IModalProps) => React.ReactNode)` (optional)                                                                           | —         | Custom icon for the close button. The callback receives the modal props, including augmented fields.                                                 |
 | `raw`                   | `boolean` (optional)                                                                                                                             | `false`   | If `true`, only the content is displayed raw in the modal.                                                                                           |
 | `transitionPreset`      | `'zoom' \| 'fade' \| 'grow' \| 'slide' \| 'collapse'` (optional)                                                                                 | `'fade'`  | Adjusts the transition using preset transitions. For more customization, use `TransitionComponent`.                                                  |
 | `transitionProps`       | `Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>` (optional)                                                    | —         | Props applied to the transition element. Applies to both the transition preset and `TransitionComponent`.                                            |
@@ -485,7 +489,7 @@ flush().then(() => {
 | `DialogProps`           | `DialogProps` (optional)                                                                                                                         | —         | Props for the Dialog component for further customization. Refer to the [Dialog props](https://mui.com/material-ui/api/dialog/#props) for details.    |
 | `header`                | `boolean \| ((params: IModalHeaderProps) => React.ReactNode) \| React.ReactElement<IModalHeaderProps>` (optional)                                | `true`    | Custom header for the modal. Defaults to `CardHeader`.                                                                                               |
 | `headerProps`           | `CardHeaderProps` (optional)                                                                                                                     | —         | Props for the header component. Refer to the [CardHeader props](https://mui.com/material-ui/api/card-header/#props) for more details.                |
-| `contentWrapper`        | `boolean \| ((params: IBottomSheetContentWrapperProps) => React.ReactNode) \| React.ReactElement<IBottomSheetContentWrapperProps>` (optional)    | `true`    | Pass a custom content wrapper or `false` to remove wrapper                                                                                           |
+| `contentWrapper`        | `boolean \| ((params: IModalContentWrapperProps) => React.ReactNode) \| React.ReactElement<IModalContentWrapperProps>` (optional)                  | `true`    | Pass a custom content wrapper or `false` to remove wrapper                                                                                           |
 | `contentWrapperProps`   | `BoxProps` (optional)                                                                                                                            | —         | Props for the content wrapper component. Refer to the [Box props](https://mui.com/material-ui/api/card-content/#props) for details.                  |
 | `reactSuspenseFallback` | `React.ReactNode` (optional)                                                                                                                     | —         | Custom React Suspense fallback UI for lazy-loaded contents.                                                                                          |
 
@@ -524,46 +528,46 @@ const modalId = await pushModal('content');
 
 #### options
 
-| Property                   | Type                                                                                                        | Default    | Description                                                                                                      |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
-| `containerId`              | `Id` (optional)                                                                                             | -          | Container ID to handle multiple containers.                                                                      |
-| `alertDialogId`            | `Id` (optional)                                                                                             | -          | Set a custom `alertDialogId` to prevent duplication.                                                             |
-| `content`                  | `React.ReactNode` (optional)                                                                                | -          | Content of the alert dialog.                                                                                     |
-| `title`                    | `React.ReactNode` (optional)                                                                                | -          | Title of the alert dialog.                                                                                       |
-| `onConfirmCancel`          | `() => void` (optional)                                                                                     | -          | Called when the cancel button is clicked.                                                                        |
-| `onConfirmOk`              | `() => void` (optional)                                                                                     | -          | Called when the OK button is clicked.                                                                            |
-| `confirmOkText`            | `string` (optional)                                                                                         | `"ok"`     | Label for the OK action button.                                                                                  |
-| `confirmOkButtonProps`     | `ButtonProps` (optional)                                                                                    | -          | Props for the OK button for further customization.                                                               |
-| `confirmCancelText`        | `string` (optional)                                                                                         | `"cancel"` | Label for the cancel action button.                                                                              |
-| `confirmCancelButtonProps` | `ButtonProps` (optional)                                                                                    | -          | Props for the cancel button for further customization.                                                           |
-| `actionButtons`            | `((props: IActionButtonsProps) => React.ReactNode) \| React.ReactElement<IActionButtonsProps>` (optional)   | -          | Pass custom Dialog Actions. By default, actions are OK and cancel.                                               |
-| `closeButton`              | `boolean \| ((props: ICloseButtonProps) => React.ReactNode) \| React.ReactElement<ICloseButtonProps>` (optional) | `false`    | Custom close button. Pass `false` to hide it. Hidden by default. When shown, defaults to `IconButton` and renders after the actions. |
-| `closeButtonProps`         | `IconButtonProps` (optional)                                                                                    | -          | Props applied to the close button element. Refer to the [IconButton props](https://mui.com/material-ui/api/icon-button/#props) for more details. |
-| `closeButtonIcon`          | `React.ReactNode \| ((props: Pick<IAlertDialogCommonOptions, 'transitionPreset' \| 'transitionProps' \| 'fullScreen'>) => React.ReactNode)` (optional) | -          | Custom icon for the close button.                                                                                                            |
-| `layout`                   | `boolean \| ((props: IAlertDialogLayoutProps) => React.ReactNode) \| React.ReactElement<IAlertDialogLayoutProps>` (optional) | -          | Custom layout for title, content, actions, and the close button. Defaults to title, content, actions, then the close button when it is shown. |
-| `onOpen`                   | `() => void` (optional)                                                                                     | -          | Called when the modal is mounted.                                                                                |
-| `onClose`                  | `() => void` (optional)                                                                                     | -          | Called when the alert dialog is unmounted.                                                                       |
-| `DialogTitleProps`         | `DialogTitleProps` (optional)                                                                               | -          | Props for the DialogTitle component.                                                                             |
-| `DialogContentProps`       | `DialogContentProps>` (optional)                                                                            | -          | Props for the DialogContent component.                                                                           |
-| `DialogActionsProps`       | `DialogActionsProps>` (optional)                                                                            | -          | Props for the DialogActions component.                                                                           |
-| `reactSuspenseFallback`    | `React.ReactNode` (optional)                                                                                | -          | Set a custom React Suspense fallback UI instead of the default for lazy contents.                                |
-| `classes`                  | `DialogProps['classes'] \| ((defaultClasses: DialogProps['classes']) => DialogProps['classes'])` (optional) | -          | Override or extend the styles applied to the component.                                                          |
-| `TransitionComponent`      | `DialogProps['TransitionComponent']` (optional)                                                             | `Fade`     | The component used for the transition. Follow the guide to learn more about the requirements for this component. |
-| `slots`                    | `DialogProps['slots']` (optional)                                                                           | `{}`       | The components used for each slot inside the Modal.                                                              |
-| `slotProps`                | `DialogProps['slotProps']` (optional)                                                                       | `{}`       | The props used for each slot inside the Modal.                                                                   |
-| `fullScreen`               | `boolean` (optional)                                                                                        | `false`    | If `true`, the dialog is full-screen.                                                                            |
-| `fullWidth`                | `boolean` (optional)                                                                                        | `false`    | If `true`, the dialog stretches to `maxWidth`.                                                                   |
-| `maxWidth`                 | `Breakpoint \| false` (optional)                                                                            | `'sm'`     | Determine the max-width of the dialog.                                                                           |
-| `PaperComponent`           | `DialogProps['PaperComponent']` (optional)                                                                  | `Paper`    | The component used to render the body of the dialog.                                                             |
-| `PaperProps`               | `DialogProps['PaperProps']` (optional)                                                                      | `{}`       | Props applied to the `Paper` element.                                                                            |
-| `scroll`                   | `'body' \| 'paper'` (optional)                                                                              | `'paper'`  | Determine the container for scrolling the dialog.                                                                |
-| `sx`                       | `DialogProps['sx']` (optional)                                                                              | -          | The system prop that allows defining system overrides as well as additional CSS styles.                          |
-| `transitionDuration`       | `DialogProps['transitionDuration']` (optional)                                                              | —          | The duration for the transition, in milliseconds.                                                                |
-| `transitionPreset`         | `'zoom' \| 'fade' \| 'grow' \| 'slide' \| 'collapse'` (optional)                                            | `'fade'`   | Adjust the transition with preset Transitions. If you want more customization, use `TransitionComponent` prop.   |
-| `transitionProps`          | `Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>` (optional)               | -          | Props applied to the transition element.                                                                         |
-| `closeOnBackdropClick`     | `boolean` (optional)                                                                                        | `true`     | If `true`, the alert dialog closes when the backdrop is clicked.                                                 |
-| `closeOnEscape`            | `boolean` (optional)                                                                                        | `true`     | If `true`, the alert dialog closes when Escape is pressed.                                                       |
-| `DialogProps`              | `DialogProps` (optional)                                                                                    | -          | Props for the Dialog component for further customization.                                                        |
+| Property                   | Type                                                                                                                                                   | Default    | Description                                                                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `containerId`              | `Id` (optional)                                                                                                                                        | -          | Container ID to handle multiple containers.                                                                                                      |
+| `alertDialogId`            | `Id` (optional)                                                                                                                                        | -          | Set a custom `alertDialogId` to prevent duplication.                                                                                             |
+| `content`                  | `React.ReactNode` (optional)                                                                                                                           | -          | Content of the alert dialog.                                                                                                                     |
+| `title`                    | `React.ReactNode` (optional)                                                                                                                           | -          | Title of the alert dialog.                                                                                                                       |
+| `onConfirmCancel`          | `() => void` (optional)                                                                                                                                | -          | Called when the cancel button is clicked.                                                                                                        |
+| `onConfirmOk`              | `() => void` (optional)                                                                                                                                | -          | Called when the OK button is clicked.                                                                                                            |
+| `confirmOkText`            | `string` (optional)                                                                                                                                    | `"ok"`     | Label for the OK action button.                                                                                                                  |
+| `confirmOkButtonProps`     | `ButtonProps` (optional)                                                                                                                               | -          | Props for the OK button for further customization.                                                                                               |
+| `confirmCancelText`        | `string` (optional)                                                                                                                                    | `"cancel"` | Label for the cancel action button.                                                                                                              |
+| `confirmCancelButtonProps` | `ButtonProps` (optional)                                                                                                                               | -          | Props for the cancel button for further customization.                                                                                           |
+| `actionButtons`            | `((props: IActionButtonsProps) => React.ReactNode) \| React.ReactElement<IActionButtonsProps>` (optional)                                              | -          | Pass custom Dialog Actions. By default, actions are OK and cancel.                                                                               |
+| `closeButton`              | `boolean \| ((props: ICloseButtonProps) => React.ReactNode) \| React.ReactElement<ICloseButtonProps>` (optional)                                       | `false`    | Custom close button. Pass `false` to hide it. Hidden by default. When shown, defaults to `IconButton` and renders after the actions.             |
+| `closeButtonProps`         | `IconButtonProps` (optional)                                                                                                                           | -          | Props applied to the close button element. Refer to the [IconButton props](https://mui.com/material-ui/api/icon-button/#props) for more details. |
+| `closeButtonIcon`          | `React.ReactNode \| ((props: IAlertDialogProps) => React.ReactNode)` (optional)                                                                        | -          | Custom icon for the close button. The callback receives the alert dialog props, including augmented fields.                                      |
+| `layout`                   | `boolean \| ((props: IAlertDialogLayoutProps) => React.ReactNode) \| React.ReactElement<IAlertDialogLayoutProps>` (optional)                           | -          | Custom layout for title, content, actions, and the close button. Defaults to title, content, actions, then the close button when it is shown.    |
+| `onOpen`                   | `() => void` (optional)                                                                                                                                | -          | Called when the modal is mounted.                                                                                                                |
+| `onClose`                  | `() => void` (optional)                                                                                                                                | -          | Called when the alert dialog is unmounted.                                                                                                       |
+| `DialogTitleProps`         | `DialogTitleProps` (optional)                                                                                                                          | -          | Props for the DialogTitle component.                                                                                                             |
+| `DialogContentProps`       | `DialogContentProps>` (optional)                                                                                                                       | -          | Props for the DialogContent component.                                                                                                           |
+| `DialogActionsProps`       | `DialogActionsProps>` (optional)                                                                                                                       | -          | Props for the DialogActions component.                                                                                                           |
+| `reactSuspenseFallback`    | `React.ReactNode` (optional)                                                                                                                           | -          | Set a custom React Suspense fallback UI instead of the default for lazy contents.                                                                |
+| `classes`                  | `DialogProps['classes'] \| ((defaultClasses: DialogProps['classes']) => DialogProps['classes'])` (optional)                                            | -          | Override or extend the styles applied to the component.                                                                                          |
+| `TransitionComponent`      | `DialogProps['TransitionComponent']` (optional)                                                                                                        | `Fade`     | The component used for the transition. Follow the guide to learn more about the requirements for this component.                                 |
+| `slots`                    | `DialogProps['slots']` (optional)                                                                                                                      | `{}`       | The components used for each slot inside the Modal.                                                                                              |
+| `slotProps`                | `DialogProps['slotProps']` (optional)                                                                                                                  | `{}`       | The props used for each slot inside the Modal.                                                                                                   |
+| `fullScreen`               | `boolean` (optional)                                                                                                                                   | `false`    | If `true`, the dialog is full-screen.                                                                                                            |
+| `fullWidth`                | `boolean` (optional)                                                                                                                                   | `false`    | If `true`, the dialog stretches to `maxWidth`.                                                                                                   |
+| `maxWidth`                 | `Breakpoint \| false` (optional)                                                                                                                       | `'sm'`     | Determine the max-width of the dialog.                                                                                                           |
+| `PaperComponent`           | `DialogProps['PaperComponent']` (optional)                                                                                                             | `Paper`    | The component used to render the body of the dialog.                                                                                             |
+| `PaperProps`               | `DialogProps['PaperProps']` (optional)                                                                                                                 | `{}`       | Props applied to the `Paper` element.                                                                                                            |
+| `scroll`                   | `'body' \| 'paper'` (optional)                                                                                                                         | `'paper'`  | Determine the container for scrolling the dialog.                                                                                                |
+| `sx`                       | `DialogProps['sx']` (optional)                                                                                                                         | -          | The system prop that allows defining system overrides as well as additional CSS styles.                                                          |
+| `transitionDuration`       | `DialogProps['transitionDuration']` (optional)                                                                                                         | —          | The duration for the transition, in milliseconds.                                                                                                |
+| `transitionPreset`         | `'zoom' \| 'fade' \| 'grow' \| 'slide' \| 'collapse'` (optional)                                                                                       | `'fade'`   | Adjust the transition with preset Transitions. If you want more customization, use `TransitionComponent` prop.                                   |
+| `transitionProps`          | `Omit<SlideProps & GrowProps & FadeProps & ZoomProps & CollapseProps, 'children'>` (optional)                                                          | -          | Props applied to the transition element.                                                                                                         |
+| `closeOnBackdropClick`     | `boolean` (optional)                                                                                                                                   | `true`     | If `true`, the alert dialog closes when the backdrop is clicked.                                                                                 |
+| `closeOnEscape`            | `boolean` (optional)                                                                                                                                   | `true`     | If `true`, the alert dialog closes when Escape is pressed.                                                                                       |
+| `DialogProps`              | `DialogProps` (optional)                                                                                                                               | -          | Props for the Dialog component for further customization.                                                                                        |
 
 #### `AlertDialogContainer` props
 
@@ -703,6 +707,7 @@ const lightboxId = await pushLightbox({ slides: [...] });
 | `headerProps`           | `CardHeaderProps` (optional)                                                                                                                  | —                                                                   | Props for the header component. Refer to the [CardHeader props](https://mui.com/material-ui/api/card-header/#props) for more details.                                                                                    |
 | `contentWrapper`        | `boolean \| ((params: IBottomSheetContentWrapperProps) => React.ReactNode) \| React.ReactElement<IBottomSheetContentWrapperProps>` (optional) | `true`                                                              | Pass a custom content wrapper or `false` to remove wrapper                                                                                                                                                               |
 | `contentWrapperProps`   | `BoxProps` (optional)                                                                                                                         | —                                                                   | Props for the content wrapper component. Refer to the [Box props](https://mui.com/material-ui/api/card-content/#props) for details.                                                                                      |
+| `reactSuspenseFallback` | `React.ReactNode` (optional)                                                                                                                  | —                                                                   | Custom React Suspense fallback UI for lazy-loaded contents.                                                                                                                                                             |
 | `expandOnContentDrag`   | `boolean` (optional)                                                                                                                          | `false`                                                             | Allows expanding the bottom sheet by dragging content. By default, users can only expand it by dragging the header or overlay.                                                                                           |
 
 #### `BottomSheetContainer` props
@@ -827,10 +832,11 @@ The `RmoStack` module provides methods for managing a stack with integration int
 
 Options for the `push` method.
 
-| Property     | Type         | Description                                                  |
-| ------------ | ------------ | ------------------------------------------------------------ |
-| `id`         | `Id`         | Optional identifier for the item being pushed.               |
-| `onPopState` | `() => void` | Callback function that gets invoked when the item is popped. |
+| Property      | Type         | Description                                                                                                                            |
+| ------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`          | `Id`         | Optional identifier for the item being pushed.                                                                                         |
+| `onPopState`  | `() => void` | Required. Invoked when the item is popped, including when the browser moves back.                                                      |
+| `onRedoState` | `() => void` | Required. Invoked when the browser moves forward onto this history entry. Restore the overlay without pushing a new history entry. |
 
 ##### `SinglePopOptions`
 
@@ -845,7 +851,7 @@ Options for the `pop` method when popping a single item.
 
 ##### `push(options: PushOptions): Promise<{ id: Id; index: number }>`
 
-Pushes a new item onto the stack, sets an event listener, and updates the history state.
+Pushes a new item onto the stack, sets pop and redo listeners, and updates the history state.
 
 - **Parameters**
   - `options`: An object of type `PushOptions`.
@@ -908,8 +914,12 @@ import { RmoStack } from 'react-material-overlay';
 RmoStack.push({
 	id: 'uniqueId',
 	onPopState: () => {
-		// this callback invoked when browser history was poped
+		// Invoked when this item is popped, including browser back.
 		console.log('Item popped from the stack');
+	},
+	onRedoState: () => {
+		// Restore the overlay. Do not push a new history entry.
+		console.log('Item restored from browser forward');
 	}
 }).then(({ id, index }) => {
 	console.log(`Pushed item with id ${id} at index ${index}`);
