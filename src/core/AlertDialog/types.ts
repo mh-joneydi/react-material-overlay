@@ -16,22 +16,6 @@ import { ICloseButtonProps } from '../../components/CloseButton';
 import { transitionPreset } from '../../components/getPresetTransitionComponent';
 import { Id } from '../../types';
 
-export interface IActionButtonsProps {
-	defaultButtons: React.ReactNode;
-	closeAlertDialog: IAlertDialogProps['closeAlertDialog'];
-}
-
-export interface IAlertDialogLayoutProps {
-	title?: React.ReactNode;
-	content?: React.ReactNode;
-	actions: React.ReactNode;
-	closeButton: React.ReactNode;
-	closeAlertDialog: () => Promise<boolean>;
-	DialogTitleProps?: Omit<DialogTitleProps, 'children'>;
-	DialogContentProps?: Omit<DialogContentProps, 'children'>;
-	DialogActionsProps?: Omit<DialogActionsProps, 'children'>;
-}
-
 export type IAlertDialogFrequentlyUsedDialogProps = Pick<
 	DialogProps,
 	| 'fullScreen'
@@ -47,6 +31,21 @@ export type IAlertDialogFrequentlyUsedDialogProps = Pick<
 	| 'slotProps'
 >;
 
+/**
+ * Shared alert dialog options.
+ *
+ * Augment this interface to add custom fields. They are accepted by `pushAlertDialog`
+ * and container `defaultOptions`, and passed through to `layout`, `actionButtons`, and `closeButtonIcon`.
+ *
+ * @example
+ * ```
+ * declare module 'react-material-overlay' {
+ *   interface IAlertDialogCommonOptions {
+ *     icon?: React.ReactNode;
+ *   }
+ * }
+ * ```
+ */
 export interface IAlertDialogCommonOptions extends IAlertDialogFrequentlyUsedDialogProps {
 	/**
 	 * ok action button label
@@ -96,11 +95,7 @@ export interface IAlertDialogCommonOptions extends IAlertDialogFrequentlyUsedDia
 	/**
 	 * Pass a custom icon for closeButton element.
 	 */
-	closeButtonIcon?:
-		| React.ReactNode
-		| ((
-				props: Pick<IAlertDialogCommonOptions, 'transitionPreset' | 'transitionProps' | 'fullScreen'>
-		  ) => React.ReactNode);
+	closeButtonIcon?: React.ReactNode | ((props: IAlertDialogProps) => React.ReactNode);
 	/**
 	 * Pass a custom layout for the alert dialog regions.
 	 *
@@ -275,4 +270,13 @@ export interface IAlertDialogProps extends IAlertDialogOptions {
 
 export interface INotValidatedAlertDialogProps extends Partial<IAlertDialogProps> {
 	alertDialogId: Id;
+}
+
+export interface IActionButtonsProps extends IAlertDialogProps {
+	defaultButtons: React.ReactNode;
+}
+
+export interface IAlertDialogLayoutProps extends Omit<IAlertDialogProps, 'closeButton'> {
+	actions: React.ReactNode;
+	closeButton: React.ReactNode;
 }

@@ -28,6 +28,21 @@ export type LightboxSlideshowRef = SlideshowRef;
 export type LightboxThumbnailsRef = ThumbnailsRef;
 export type LightboxFullscreenRef = FullscreenRef;
 
+/**
+ * Shared lightbox options.
+ *
+ * Augment this interface to add custom fields. They are accepted by `pushLightbox`
+ * and container `defaultOptions`, and kept on the lightbox props.
+ *
+ * @example
+ * ```
+ * declare module 'react-material-overlay' {
+ *   interface ILightboxCommonOptions {
+ *     watermark?: React.ReactNode;
+ *   }
+ * }
+ * ```
+ */
 export interface ILightboxCommonOptions {
 	/** lifecycle callbacks */
 	on?: LightboxProps['on'];

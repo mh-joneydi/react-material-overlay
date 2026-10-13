@@ -18,8 +18,8 @@ import useBlockEscapeKey from '../useBlockEscapeKey';
 import BottomSheetContentWrapper from './BottomSheetContentWrapper';
 import BottomSheetDefaultHeader from './BottomSheetDefaultHeader';
 
-export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function BottomSheet(
-	{
+export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function BottomSheet(props, ref) {
+	const {
 		children,
 		show,
 		deleteBottomSheet,
@@ -46,19 +46,13 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 		BottomSheetProps,
 		sx,
 		closeButtonProps,
-		headerProps,
 		closeButton,
 		closeButtonIcon,
 		defaultHeader,
-		subheader,
-		title,
-		contentWrapperProps,
 		contentWrapper,
 		closeOnBackdropClick,
 		closeOnEscape
-	},
-	ref
-) {
+	} = props;
 	const sequenceNumber = useRmoStackItemIndex(bottomSheetId);
 	const rsbsId = `rsbs-${containerId}-${bottomSheetId}`;
 
@@ -83,20 +77,8 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 	}
 
 	const _headerProps: IBottomSheetHeaderProps = {
-		closeButton: Close,
-		closeBottomSheet,
-		bottomSheetId,
-		containerId,
-		blocking,
-		defaultSnap,
-		expandOnContentDrag,
-		maxHeight,
-		reserveScrollBarGap,
-		scrollLocking,
-		snapPoints,
-		headerProps,
-		subheader,
-		title
+		...props,
+		closeButton: Close
 	};
 
 	let Header: React.ReactNode;
@@ -106,7 +88,10 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 	} else if (isFn(header)) {
 		Header = header(_headerProps);
 	} else if (React.isValidElement(header)) {
-		Header = React.cloneElement(header, _headerProps);
+		const headerElementProps = { ..._headerProps };
+		delete headerElementProps.children;
+		delete headerElementProps.ref;
+		Header = React.cloneElement(header, headerElementProps);
 	} else if (defaultHeader !== false) {
 		Header = BottomSheetDefaultHeader(_headerProps);
 	}
@@ -114,17 +99,7 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 	const content = <React.Suspense fallback={reactSuspenseFallback || <SuspenseFallback />}>{children}</React.Suspense>;
 
 	const _contentWrapperProps: IBottomSheetContentWrapperProps = {
-		bottomSheetId,
-		closeBottomSheet,
-		containerId,
-		blocking,
-		contentWrapperProps,
-		defaultSnap,
-		expandOnContentDrag,
-		maxHeight,
-		reserveScrollBarGap,
-		scrollLocking,
-		snapPoints,
+		...props,
 		children: content
 	};
 
@@ -135,7 +110,9 @@ export default React.forwardRef<BottomSheetRef, IBottomSheetProps>(function Bott
 	} else if (isFn(contentWrapper)) {
 		WrappedContent = contentWrapper(_contentWrapperProps);
 	} else if (React.isValidElement(contentWrapper)) {
-		WrappedContent = React.cloneElement(contentWrapper, _contentWrapperProps);
+		const contentWrapperElementProps = { ..._contentWrapperProps };
+		delete contentWrapperElementProps.ref;
+		WrappedContent = React.cloneElement(contentWrapper, contentWrapperElementProps);
 	} else {
 		WrappedContent = BottomSheetContentWrapper(_contentWrapperProps);
 	}

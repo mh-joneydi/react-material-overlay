@@ -45,6 +45,7 @@ npm install @mui/material @emotion/react @emotion/styled
   - [Lightbox Overlay](#lightbox-overlay)
   - [Bottom Sheet Overlay](#bottom-sheet-overlay)
   - [Closing Overlays](#closing-overlays)
+- [Extending Overlay Options](#extending-overlay-options)
 - [Custom Overlays](#custom-overlays)
 - [Caveats](#caveats)
 - [API Reference](#api-reference)
@@ -293,6 +294,42 @@ const App = () => {
   );
 }
 ```
+
+---
+
+## Extending Overlay Options
+
+Add fields to an overlay by augmenting its common options interface. Those fields are accepted by the matching `push*` call and by the container `defaultOptions`, and they are passed into the overlay render callbacks instead of a fixed subset of props.
+
+| Overlay | Augment | Available in |
+| --- | --- | --- |
+| Alert dialog | `IAlertDialogCommonOptions` | `layout`, `actionButtons`, `closeButtonIcon` |
+| Modal | `IModalCommonOptions` | `header`, `contentWrapper`, `closeButtonIcon`, and the content render props (`modalProps`) |
+| Bottom sheet | `IBottomSheetCommonOptions` | `header`, `contentWrapper`, `footer`, `sibling`, and the content render props (`bottomSheetProps`) |
+| Lightbox | `ILightboxCommonOptions` | the lightbox props passed to `pushLightbox` |
+
+```tsx
+declare module 'react-material-overlay' {
+	interface IAlertDialogCommonOptions {
+		icon?: React.ReactNode;
+	}
+}
+
+pushAlertDialog({
+	icon: <WarningIcon />,
+	title: 'Title',
+	layout: ({ icon, title, content, actions }) => (
+		<>
+			{icon}
+			<DialogTitle>{title}</DialogTitle>
+			<DialogContent>{content}</DialogContent>
+			<DialogActions>{actions}</DialogActions>
+		</>
+	)
+});
+```
+
+The same `icon` field can be read from a modal `header` or `contentWrapper`, or from a bottom sheet `header`, `footer`, or content function, after augmenting that overlay's common options interface.
 
 ---
 

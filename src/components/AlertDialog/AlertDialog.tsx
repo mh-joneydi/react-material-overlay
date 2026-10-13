@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Dialog } from '@mui/material';
 
-import { IAlertDialogLayoutProps, IAlertDialogProps } from '../../core/AlertDialog/types';
+import { IActionButtonsProps, IAlertDialogLayoutProps, IAlertDialogProps } from '../../core/AlertDialog/types';
 import { useRmoStackItemIndex } from '../../hooks';
 import { isFn } from '../../utils/propValidator';
 import CloseButton, { ICloseButtonProps } from '../CloseButton';
@@ -11,46 +11,42 @@ import SuspenseFallback from '../SuspenseFallback';
 
 import AlertDialogLayout from './AlertDialogLayout';
 
-const AlertDialog = ({
-	title,
-	content,
-	closeAlertDialog,
-	DialogActionsProps,
-	DialogContentProps,
-	DialogTitleProps,
-	deleteAlertDialog,
-	slotProps,
-	show,
-	fullScreen,
-	maxWidth,
-	scroll,
-	fullWidth,
-	transitionPreset,
-	closeOnBackdropClick,
-	closeOnEscape,
-	PaperComponent,
-	PaperProps,
-	DialogProps,
-	TransitionComponent,
-	transitionProps,
-	sx,
-	classes,
-	slots,
-	transitionDuration,
-	reactSuspenseFallback,
-	onConfirmOk,
-	onConfirmCancel,
-	confirmCancelButtonProps,
-	confirmOkButtonProps,
-	confirmCancelText,
-	confirmOkText,
-	actionButtons,
-	alertDialogId,
-	closeButton,
-	closeButtonProps,
-	closeButtonIcon,
-	layout
-}: IAlertDialogProps) => {
+const AlertDialog = (props: IAlertDialogProps) => {
+	const {
+		closeAlertDialog,
+		deleteAlertDialog,
+		slotProps,
+		show,
+		fullScreen,
+		maxWidth,
+		scroll,
+		fullWidth,
+		transitionPreset,
+		closeOnBackdropClick,
+		closeOnEscape,
+		PaperComponent,
+		PaperProps,
+		DialogProps,
+		TransitionComponent,
+		transitionProps,
+		sx,
+		classes,
+		slots,
+		transitionDuration,
+		reactSuspenseFallback,
+		onConfirmOk,
+		onConfirmCancel,
+		confirmCancelButtonProps,
+		confirmOkButtonProps,
+		confirmCancelText,
+		confirmOkText,
+		actionButtons,
+		alertDialogId,
+		closeButton,
+		closeButtonProps,
+		closeButtonIcon,
+		layout
+	} = props;
 	const sequenceNumber = useRmoStackItemIndex(alertDialogId);
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
@@ -100,9 +96,9 @@ const AlertDialog = ({
 	let Actions: React.ReactNode = defaultActionButtons;
 
 	if (actionButtons) {
-		const actionButtonsProps = {
-			defaultButtons: defaultActionButtons,
-			closeAlertDialog
+		const actionButtonsProps: IActionButtonsProps = {
+			...props,
+			defaultButtons: defaultActionButtons
 		};
 
 		if (isFn(actionButtons)) {
@@ -115,9 +111,7 @@ const AlertDialog = ({
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeAlertDialog,
-		icon: isFn(closeButtonIcon)
-			? closeButtonIcon({ transitionPreset, transitionProps, fullScreen })
-			: closeButtonIcon || <CloseButtonIcon />
+		icon: isFn(closeButtonIcon) ? closeButtonIcon(props) : closeButtonIcon || <CloseButtonIcon />
 	};
 
 	let Close: React.ReactNode = null;
@@ -133,14 +127,9 @@ const AlertDialog = ({
 	}
 
 	const _layoutProps: IAlertDialogLayoutProps = {
-		title,
-		content,
+		...props,
 		actions: Actions,
-		closeButton: Close,
-		closeAlertDialog,
-		DialogTitleProps,
-		DialogContentProps,
-		DialogActionsProps
+		closeButton: Close
 	};
 
 	let Layout: React.ReactNode;

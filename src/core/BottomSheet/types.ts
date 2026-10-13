@@ -23,8 +23,7 @@ export type RSBSProps = Pick<
 
 export interface IBottomSheetCustomRenderProps {
 	closeBottomSheet: IBottomSheetProps['closeBottomSheet'];
-	bottomSheetProps: RSBSProps &
-		Pick<IBottomSheetProps, 'bottomSheetId' | 'containerId' | 'title' | 'subheader' | 'headerProps'>;
+	bottomSheetProps: IBottomSheetProps;
 }
 
 export type BottomSheetContentProps = IBottomSheetCustomRenderProps;
@@ -34,43 +33,22 @@ export type BottomSheetSiblingProps = IBottomSheetCustomRenderProps;
 
 export type BottomSheetRef = RSBSBottomSheetRef;
 
-export interface IBottomSheetHeaderProps
-	extends Pick<
-		IBottomSheetProps,
-		| 'closeBottomSheet'
-		| 'bottomSheetId'
-		| 'defaultSnap'
-		| 'expandOnContentDrag'
-		| 'containerId'
-		| 'maxHeight'
-		| 'snapPoints'
-		| 'title'
-		| 'subheader'
-		| 'headerProps'
-		| 'scrollLocking'
-		| 'reserveScrollBarGap'
-		| 'blocking'
-	> {
-	closeButton?: React.ReactNode;
-}
-export interface IBottomSheetContentWrapperProps
-	extends Pick<
-		IBottomSheetProps,
-		| 'closeBottomSheet'
-		| 'bottomSheetId'
-		| 'contentWrapperProps'
-		| 'defaultSnap'
-		| 'expandOnContentDrag'
-		| 'containerId'
-		| 'maxHeight'
-		| 'snapPoints'
-		| 'scrollLocking'
-		| 'reserveScrollBarGap'
-		| 'blocking'
-	> {
-	children: React.ReactNode;
-}
-
+/**
+ * Shared bottom sheet options.
+ *
+ * Augment this interface to add custom fields. They are accepted by `pushBottomSheet`
+ * and container `defaultOptions`, and passed through to `header`, `contentWrapper`,
+ * `footer`, `sibling`, and the content render props.
+ *
+ * @example
+ * ```
+ * declare module 'react-material-overlay' {
+ *   interface IBottomSheetCommonOptions {
+ *     icon?: React.ReactNode;
+ *   }
+ * }
+ * ```
+ */
 export interface IBottomSheetCommonOptions extends RSBSProps {
 	/**
 	 * Pass a custom close button.
@@ -261,6 +239,12 @@ export interface IBottomSheetProps extends IBottomSheetOptions {
 export interface INotValidatedBottomSheetProps extends Partial<IBottomSheetOptions> {
 	bottomSheetId: Id;
 }
+
+export interface IBottomSheetHeaderProps extends Omit<IBottomSheetProps, 'closeButton'> {
+	closeButton?: React.ReactNode;
+}
+
+export type IBottomSheetContentWrapperProps = IBottomSheetProps;
 
 export type BottomSheetContent = React.ReactNode | ((props: BottomSheetContentProps) => React.ReactNode);
 

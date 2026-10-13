@@ -12,42 +12,38 @@ import SuspenseFallback from '../SuspenseFallback';
 import ModalContentWrapper from './ModalContentWrapper';
 import ModalHeader from './ModalHeader';
 
-const Modal = ({
-	children,
-	show,
-	deleteModal,
-	closeModal,
-	title,
-	raw,
-	fullScreen,
-	maxWidth,
-	scroll,
-	fullWidth,
-	closeButton,
-	headerProps,
-	contentWrapperProps,
-	transitionPreset,
-	closeOnBackdropClick,
-	closeOnEscape,
-	PaperComponent,
-	PaperProps,
-	DialogProps,
-	TransitionComponent,
-	transitionProps,
-	closeButtonIcon,
-	sx,
-	classes,
-	slots,
-	transitionDuration,
-	reactSuspenseFallback,
-	closeButtonProps,
-	header,
-	subheader,
-	slotProps,
-	modalId,
-	contentWrapper,
-	containerId
-}: IModalProps) => {
+const Modal = (props: IModalProps) => {
+	const {
+		children,
+		show,
+		deleteModal,
+		closeModal,
+		raw,
+		fullScreen,
+		maxWidth,
+		scroll,
+		fullWidth,
+		closeButton,
+		transitionPreset,
+		closeOnBackdropClick,
+		closeOnEscape,
+		PaperComponent,
+		PaperProps,
+		DialogProps,
+		TransitionComponent,
+		transitionProps,
+		closeButtonIcon,
+		sx,
+		classes,
+		slots,
+		transitionDuration,
+		reactSuspenseFallback,
+		closeButtonProps,
+		header,
+		slotProps,
+		modalId,
+		contentWrapper
+	} = props;
 	const sequenceNumber = useRmoStackItemIndex(modalId);
 	const PresetTransitionComponent = React.useMemo(
 		() => (transitionPreset ? getPresetTransitionComponent(transitionPreset) : undefined),
@@ -71,9 +67,7 @@ const Modal = ({
 	const _closeButtonProps: ICloseButtonProps = {
 		closeButtonProps,
 		closeHandler: closeModal,
-		icon: isFn(closeButtonIcon)
-			? closeButtonIcon({ transitionPreset, transitionProps, fullScreen })
-			: closeButtonIcon || <CloseButtonIcon />
+		icon: isFn(closeButtonIcon) ? closeButtonIcon(props) : closeButtonIcon || <CloseButtonIcon />
 	};
 
 	let Close: React.ReactNode = null;
@@ -89,18 +83,8 @@ const Modal = ({
 	}
 
 	const _headerProps: IModalHeaderProps = {
-		closeButton: Close,
-		headerProps,
-		fullScreen,
-		maxWidth,
-		scroll,
-		subheader,
-		title,
-		transitionPreset,
-		transitionProps,
-		containerId,
-		modalId,
-		closeModal
+		...props,
+		closeButton: Close
 	};
 
 	let Header: React.ReactNode = null;
@@ -110,22 +94,15 @@ const Modal = ({
 	} else if (isFn(header)) {
 		Header = header(_headerProps);
 	} else if (React.isValidElement(header)) {
-		Header = React.cloneElement(header, _headerProps);
+		const headerElementProps = { ..._headerProps };
+		delete headerElementProps.children;
+		Header = React.cloneElement(header, headerElementProps);
 	} else {
 		Header = ModalHeader(_headerProps);
 	}
 
 	const _contentWrapperProps: IModalContentWrapperProps = {
-		fullScreen,
-		maxWidth,
-		scroll,
-		contentWrapperProps,
-		modalId,
-		containerId,
-		fullWidth,
-		transitionPreset,
-		transitionProps,
-		closeModal,
+		...props,
 		children: content
 	};
 

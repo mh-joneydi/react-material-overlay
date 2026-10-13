@@ -29,41 +29,22 @@ export type IModalFrequentlyUsedDialogProps = Pick<
 	| 'slotProps'
 >;
 
-export interface IModalContentWrapperProps
-	extends Pick<
-		IModalProps,
-		| 'containerId'
-		| 'modalId'
-		| 'contentWrapperProps'
-		| 'fullScreen'
-		| 'fullWidth'
-		| 'maxWidth'
-		| 'scroll'
-		| 'transitionPreset'
-		| 'transitionProps'
-		| 'closeModal'
-	> {
-	children: React.ReactNode;
-}
-
-export interface IModalHeaderProps
-	extends Pick<
-		IModalProps,
-		| 'containerId'
-		| 'modalId'
-		| 'title'
-		| 'subheader'
-		| 'headerProps'
-		| 'fullScreen'
-		| 'scroll'
-		| 'maxWidth'
-		| 'transitionPreset'
-		| 'transitionProps'
-		| 'closeModal'
-	> {
-	closeButton?: React.ReactNode;
-}
-
+/**
+ * Shared modal options.
+ *
+ * Augment this interface to add custom fields. They are accepted by `pushModal`
+ * and container `defaultOptions`, and passed through to `header`, `contentWrapper`,
+ * `closeButtonIcon`, and the content render props.
+ *
+ * @example
+ * ```
+ * declare module 'react-material-overlay' {
+ *   interface IModalCommonOptions {
+ *     icon?: React.ReactNode;
+ *   }
+ * }
+ * ```
+ */
 export interface IModalCommonOptions extends IModalFrequentlyUsedDialogProps {
 	/**
 	 * Pass a custom close button.
@@ -81,9 +62,7 @@ export interface IModalCommonOptions extends IModalFrequentlyUsedDialogProps {
 	/**
 	 * Pass a custom icon for closeButton element.
 	 */
-	closeButtonIcon?:
-		| React.ReactNode
-		| ((props: Pick<IModalCommonOptions, 'transitionPreset' | 'transitionProps' | 'fullScreen'>) => React.ReactNode);
+	closeButtonIcon?: React.ReactNode | ((props: IModalProps) => React.ReactNode);
 	/**
 	 * If `true`, only the `content` will be displayed raw in the modal
 	 *
@@ -250,6 +229,12 @@ export interface INotValidatedModalProps extends Partial<IModalProps> {
 export interface IModalContentProps {
 	closeModal: IModalProps['closeModal'];
 	modalProps: IModalProps;
+}
+
+export type IModalContentWrapperProps = IModalProps;
+
+export interface IModalHeaderProps extends Omit<IModalProps, 'closeButton'> {
+	closeButton?: React.ReactNode;
 }
 
 export type ModalContent = React.ReactNode | ((props: IModalContentProps) => React.ReactNode);
